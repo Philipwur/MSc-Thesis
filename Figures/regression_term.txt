@@ -1,0 +1,18 @@
+theta = 90
+b' = 1
+
+Last term takes 75 seconds to calculate (cycletime of 150s)
+- extrapolation to intercept gets alpha of -11.067
+- lattice of 123by123
+
+Term 6 takes 16ms to calculate (cycletime of 0.031 seconds)
+- extrapolation is 1.337% off best prediction
+- lattice of 17by17
+
+Term 11 takes 67ms to calculate (cycletime of 0.13 seconds)
+- exterapolation is 0.497% off best prediction
+- lattice of 27by27
+
+we can itterate exactly to the error % we think is appropriate
+
+maybe for the final graphs add in the intercept values within the legend box
