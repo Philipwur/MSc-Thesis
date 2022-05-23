@@ -13,7 +13,7 @@ import seaborn as sns
 b_dash = 1
 
 #angle between planes
-theta = math.pi/2.5
+theta = math.pi/3
 
 #lattice resolution
 Nx, Ny = 17, 17
