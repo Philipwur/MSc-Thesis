@@ -21,13 +21,16 @@ import Dipole_Dipole_2D_1D_wSolver as sim
 # =============================================================================
 
 b_dash = 1
-theta = math.pi/2
+divisor = 3
+theta = math.pi/divisor
 
 start = 5 
 end = 125
 step = 2
 
 solvers = ["ev", "evr", "evd", "evx"]
+
+#%% load in data
 
 df = pd.read_csv("results/1_pi_div_2.csv", index_col=(0))
 
@@ -65,7 +68,7 @@ df["Resolution_inv"] = np.power(df["Resolution"], -1)
 
 #saving pandas dataframe to csv 
 #so it can be loaded incase graphs need to be changed
-df.to_csv("Variable_analysis.csv")
+df.to_csv("results/{}_pi_div_{}".format(b_dash, divisor))
 
 #%%
 #plotting all results 
