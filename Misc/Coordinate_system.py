@@ -1,3 +1,4 @@
+#%%
 """
 Showing off how pog the the coordinate generation is
 """
@@ -7,8 +8,6 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 import seaborn as sns
-
-#%%
 
 #lattice spacing between planes
 b_dash = 1
@@ -20,6 +19,8 @@ theta = math.pi/2.5
 Nx, Ny = 17, 17
 
 tot_atoms = Nx * Ny
+
+#%% mod generation
 
 #initialises entire rows of the lattice at once
 def single_row(b_dash, theta, j, Nx):
@@ -45,9 +46,35 @@ def generate_lattice(Nx, Ny, b_dash, theta, tot_atoms):
 
 points = generate_lattice(Nx, Ny, b_dash, theta, tot_atoms)
 
-#%%
+#%% slanted generation
 
-#plotting coordinates for inspection
+#initialises entire rows of the lattice at once
+def single_row(b_dash, theta, j, lat_size):
+    
+    x_term = round((b_dash * np.cos(theta) * j), 5)
+    y_term = j * (round(b_dash * np.sin(theta), 5))
+    
+    row = [(x_term + i, y_term) for i in range(lat_size)]
+    
+    return row
+
+#Generates the lattice by appending entire layers of the lattice at once, then calculates distance matrix
+def generate_lattice(lat_size, b_dash, theta, tot_atoms):
+    
+    points = np.empty([0, 2])
+    
+    #appending x row along y axis
+    for j in range(lat_size):
+        points = np.append(points, 
+                           single_row(b_dash, theta, j, lat_size), 
+                           axis = 0
+                           )
+
+    return points
+
+points = generate_lattice(Nx, b_dash, theta, tot_atoms)
+
+#%% plotting coordinates for inspection
 
 plt.figure(dpi = 300)
 g1 = sns.scatterplot(x = points[:,0],
