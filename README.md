@@ -25,7 +25,7 @@ polarising.
 ## To-Do
 
 ### Working on now
-- Try Rahul's way of generating points without the modulo and compare 1/N
+
 - See if regression results hold up for different lattice parameters
 - First optimisation surface plot (rough one)
 - Think about the boundary conditions of the coordinate system
@@ -70,6 +70,8 @@ W0
 
 W1
 - started github/folder setup
+- Try Rahul's way of generating points without the modulo and compare 1/N
+  - Exact same results (should be able to leverage this for some time savings)
 
 ## Notes 
 
