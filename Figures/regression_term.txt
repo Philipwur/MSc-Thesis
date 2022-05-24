@@ -20,3 +20,5 @@ maybe for the final graphs add in the intercept values within the legend box
 
 for the theta = 60 example, the term 10-11 regression is larger, at 0.666% 
 error
+
+for the theta = 45, b = 2 example, the error is 0.498%

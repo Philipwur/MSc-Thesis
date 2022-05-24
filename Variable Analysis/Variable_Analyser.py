@@ -36,9 +36,10 @@ def generate_data(b_dash, theta, test_solvers, start, end, step):
        if test_solvers:
               
               solvers = ["ev", "evr", "evd", "evx"]
+              data = np.zeros((int((end-start)/step), 6))
               
               for i in range(start, end, step):
-                     data = np.zeros((int((end-start)/step), 6))
+                     
                      data[count][0] = i
                      
                      alpha, runtime = sim.run_sim(b_dash, theta, i, solvers[0])
@@ -59,8 +60,10 @@ def generate_data(b_dash, theta, test_solvers, start, end, step):
                             "Runtime(s) evd", "Runtime(s) evx"]
               
        else:
+              data = np.zeros((int((end-start)/step), 3))
+              
               for i in range(start, end, step):
-                     data = np.zeros((int((end-start)/step), 3))
+                     
                      data[count][0] = i
                      
                      alpha, runtime = sim.run_sim(b_dash, theta, i, "evd")
@@ -78,6 +81,8 @@ def generate_data(b_dash, theta, test_solvers, start, end, step):
 
        #saving pandas dataframe to csv 
        df.to_csv("results/{}_pi_div_{}.csv".format(b_dash, divisor))
+       
+       return df
 
 # tests whether data exists, and if not, generates new data 
 def get_data(b_dash, theta, test_solvers, start, end, step):
@@ -110,28 +115,28 @@ g = sns.lineplot(x = df["Resolution"],
 plt.ylabel(r"$\alpha_{c-}^{'}$")
 
 g = sns.lineplot(x = df["Resolution"], 
-                 y = df["Runtime(s) ev"], 
-                 color = "r", 
+                 y = df["Runtime(s) evd"],
+                 color = "b", 
                  linewidth = 1,
                  ax = plt.twinx())
 
-g = sns.lineplot(x = df["Resolution"], 
-                 y = df["Runtime(s) evr"], 
-                 color = "g",
-                 linestyle = "--", 
-                 linewidth = 1)
+# g = sns.lineplot(x = df["Resolution"], 
+#                  y = df["Runtime(s) ev"], 
+#                  color = "r", 
+#                  linewidth = 1,
+#                  ax = plt.twinx())
 
-g = sns.lineplot(x = df["Resolution"], 
-                 y = df["Runtime(s) evd"],
-                 color = "b", 
-                 linewidth = 1)
+# g = sns.lineplot(x = df["Resolution"], 
+#                  y = df["Runtime(s) evr"], 
+#                  color = "g",
+#                  linestyle = "--", 
+#                  linewidth = 1)
 
-# =============================================================================
+
 # g = sns.lineplot(x = df["Resolution"], 
 #                  y = df["Runtime(s) evx"], 
 #                  color = "y", 
 #                  linewidth = 1) 
-# =============================================================================
 
 plt.ylabel("Runtime(s)")
 
@@ -144,10 +149,10 @@ plt.title(r"b' : {},   $\theta$ : {}°".format(b_dash,
 
 g.legend(handles=[Line2D([], [], marker='_', color="k", 
                          label=r"$\alpha_{c-}^{'}$"), 
-                  Line2D([], [], marker='_', color="r", 
-                         label='Runtime ev'),
-                  Line2D([], [], linestyle = '--', color="g", 
-                         label='Runtime evr'),
+              #     Line2D([], [], marker='_', color="r", 
+              #            label='Runtime ev'),
+              #     Line2D([], [], linestyle = '--', color="g", 
+              #            label='Runtime evr'),
                   Line2D([], [], marker='_', color="b", 
                          label='Runtime evd')],
                   #Line2D([], [], marker='_', color="y", label='Runtime evx')],

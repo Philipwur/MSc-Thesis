@@ -26,7 +26,6 @@ polarising.
 
 ### Working on now
 
-- See if regression results hold up for different lattice parameters
 - First optimisation surface plot (rough one)
 - Think about the boundary conditions of the coordinate system
   - e.g. equivalent lattices generated with different b' and thetas
@@ -72,7 +71,9 @@ W1
 - started github/folder setup
 - Try Rahul's way of generating points without the modulo and compare 1/N
   - Exact same results (should be able to leverage this for some time savings)
-
+- See if regression results hold up for different lattice parameters
+  - Regression results hold up, but error range varies (0.666-0.4%)
+ 
 ## Notes 
 
 just random stuff for me, not rigourously checked
