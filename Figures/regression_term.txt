@@ -16,3 +16,7 @@ Term 11 takes 67ms to calculate (cycletime of 0.13 seconds)
 we can itterate exactly to the error % we think is appropriate
 
 maybe for the final graphs add in the intercept values within the legend box
+
+
+for the theta = 60 example, the term 10-11 regression is larger, at 0.666% 
+error

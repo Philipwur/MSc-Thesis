@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+# for testing the runtime and extrapolation in the 2D dipole-dipole function
+
 #%%
-#loading df back into python and preparing environment
 
 import pandas as pd
 import math
@@ -13,62 +14,86 @@ import seaborn as sns
 
 import Dipole_Dipole_2D_1D_wSolver as sim
 
-# =============================================================================
-# for testing the runtime and extrapolation in the 2D dipole-dipole function
-# 
-# potential solvers include ev, evr, evd, evx 
-# point 5 - 7 seems to be good for creating a regression
-# =============================================================================
-
-b_dash = 1
-divisor = 3
+#Hyperparameters
+#==============================================================================
+b_dash = 2
+divisor = 4
 theta = math.pi/divisor
 
 start = 5 
 end = 125
 step = 2
 
-solvers = ["ev", "evr", "evd", "evx"]
+#select whether you want to compare runtimes of solvers
+test_solvers = False 
+# =============================================================================
 
-#%% load in data
+#test runs of Dipole-Dipole 2D-1D script with 1 or multiple solvers
+def generate_data(b_dash, theta, test_solvers, start, end, step):
+       
+       count = 0
+       
+       if test_solvers:
+              
+              solvers = ["ev", "evr", "evd", "evx"]
+              
+              for i in range(start, end, step):
+                     data = np.zeros((int((end-start)/step), 6))
+                     data[count][0] = i
+                     
+                     alpha, runtime = sim.run_sim(b_dash, theta, i, solvers[0])
+                     
+                     data[count][1] = alpha
+                     data[count][2] = runtime
+                     
+                     for j in range(1, 4):
+                            alpha, runtime = sim.run_sim(b_dash, theta, i, solvers[j])
+                            data[count][j+2] = runtime
+                     
+                     count += 1
+                     
+              df = pd.DataFrame(data = data)
 
-df = pd.read_csv("results/1_pi_div_2.csv", index_col=(0))
+              df.columns = ["Resolution", "Alpha", 
+                            "Runtime(s) ev", "Runtime(s) evr", 
+                            "Runtime(s) evd", "Runtime(s) evx"]
+              
+       else:
+              for i in range(start, end, step):
+                     data = np.zeros((int((end-start)/step), 3))
+                     data[count][0] = i
+                     
+                     alpha, runtime = sim.run_sim(b_dash, theta, i, "evd")
+                     data[count][1] = alpha
+                     data[count][2] = runtime
+                     
+                     count += 1
+                     
+              df = pd.DataFrame(data = data)
 
-#%%
-"""DO NOT RUN THIS UNLESS YOU WANT TO COLLECT NEW DATA"""
-#make sure you also change filename at the bottom :^)
+              df.columns = ["Resolution", "Alpha", "Runtime(s) evd"]
+                     
 
-#test runs of Dipole-Dipole 2D-1D script using different eig solvers
-#original method of collecting data
-data = np.zeros((int((end-start)/step), 6))
+       df["Resolution_inv"] = np.power(df["Resolution"], -1)
 
-count = 0
-for i in range(start, end, step):
-    
-    data[count][0] = i
-    
-    alpha, runtime = sim.run_sim(b_dash, theta, i, solvers[0])
-    
-    data[count][1] = alpha
-    data[count][2] = runtime
-    
-    for j in range(1, 4):
-        alpha, runtime = sim.run_sim(b_dash, theta, i, solvers[j])
-        data[count][j+2] = runtime
-    
-    count += 1
-    
-df = pd.DataFrame(data = data)
+       #saving pandas dataframe to csv 
+       df.to_csv("results/{}_pi_div_{}.csv".format(b_dash, divisor))
 
-df.columns = ["Resolution", "Alpha", 
-              "Runtime(s) ev", "Runtime(s) evr", 
-              "Runtime(s) evd", "Runtime(s) evx"]
+# tests whether data exists, and if not, generates new data 
+def get_data(b_dash, theta, test_solvers, start, end, step):
+       
+       datafile = "{}_pi_div_{}.csv".format(b_dash, divisor)
+       
+       try:
+              df = pd.read_csv("results/{}".format(datafile), index_col=(0))
 
-df["Resolution_inv"] = np.power(df["Resolution"], -1)
-
-#saving pandas dataframe to csv 
-#so it can be loaded incase graphs need to be changed
-df.to_csv("results/{}_pi_div_{}".format(b_dash, divisor))
+       except:
+              df = generate_data(b_dash, theta, test_solvers, start, end, step)
+              
+       return df
+       
+if __name__ == "__main__":
+       df = get_data(b_dash, theta, test_solvers, start, end, step)
 
 #%%
 #plotting all results 
@@ -113,7 +138,8 @@ plt.ylabel("Runtime(s)")
 plt.suptitle(r"Resolution's effect on Runtime (s) and $\alpha_{c-}^{'}$", 
              y = 1)
 
-plt.title(r"b' : {},   $\theta$ : {}°".format(b_dash, math.degrees(theta)), 
+plt.title(r"b' : {},   $\theta$ : {}°".format(b_dash, 
+                                              round(math.degrees(theta), 3)), 
           fontsize = 10 )
 
 g.legend(handles=[Line2D([], [], marker='_', color="k", 
@@ -193,7 +219,7 @@ g3 = sns.regplot(x = df.Resolution_inv.iloc[-3:-1],
 plt.suptitle(r"Inverse Lattice Resolution's Relationship with $\alpha_{c-}^{'}$",
              y = 1.00)
 plt.title((r"b' : {},   $\theta$ : {}°,   N $\in$ {{ 5, 7, 9, $\cdots$, 123 }}"
-           .format(b_dash, math.degrees(theta))), fontsize = 12)
+           .format(b_dash, round(math.degrees(theta), 3))), fontsize = 12)
 plt.xlabel(r"Inverse Lattice Resolution ( $N^{-1}$ )")
 plt.ylabel(r"$\alpha_{c-}^{'}$")
 
@@ -210,8 +236,8 @@ plt.show()
 #calculating the error between extrapolations
 
 print(df.loc[10:11,["Resolution_inv", "Alpha", "Resolution"]])
-result_aprox = stat.linregress(x = df.loc[5:6, "Resolution_inv"],
-                               y = df.loc[5:6, "Alpha"])
+result_aprox = stat.linregress(x = df.loc[11:12, "Resolution_inv"],
+                               y = df.loc[11:12, "Alpha"])
 
 result_fin = stat.linregress(x = df.Resolution_inv.iloc[-3:-1],
                              y = df.Alpha.iloc[-3:-1])
