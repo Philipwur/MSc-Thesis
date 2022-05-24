@@ -1,4 +1,3 @@
-#%%
 # -*- coding: utf-8 -*-
 import time
 import math
@@ -27,7 +26,7 @@ b_dash = 1
 theta = math.pi / 2
 
 #lattice resolution (how many atoms in x and y directions)
-lat_size = 100
+lat_size = 40
 
 
 #functions defined here
@@ -35,8 +34,8 @@ lat_size = 100
 #initialises entire rows of the lattice at once
 def single_row(b_dash, theta, j, lat_size):
     
-    x_term = round((b_dash * np.cos(theta) * j) % 1, 5)
-    y_term = j * (round(b_dash * np.sin(theta), 5))
+    x_term = np.round((b_dash * np.cos(theta) * j) % 1, 5)
+    y_term = j * (np.round(b_dash * np.sin(theta), 5))
     
     x_row = np.arange(x_term, lat_size * 1, 1)
     y_row = np.repeat(y_term, lat_size)
@@ -97,7 +96,7 @@ def run_sim(b_dash, theta, lat_size):
     print("--------------------------------")
     print(" Variables:")
     print(" b':", b_dash)
-    print(" θ:", round(theta, 4))
+    print(" θ:", np.round(theta, 4))
     print(" Lattice resolution: {0} by {0}".format(lat_size))
     
     start_time = time.perf_counter()
@@ -107,20 +106,20 @@ def run_sim(b_dash, theta, lat_size):
     points, dist = generate_lattice(lat_size, b_dash, theta, tot_atoms)
     
     time_dist = time.perf_counter()
-    print("\n", "Distance Matrix Created (s):", round(time_dist - start_time, 3))
+    print("\n", "Distance Matrix Created (s):", np.round(time_dist - start_time, 3))
     
     dip_relation = generate_dip_relation(tot_atoms, dist)
     
     time_dip = time.perf_counter()
-    print(" Dipole Matrix Created (s):", round(time_dip - time_dist, 3))
+    print(" Dipole Matrix Created (s):", np.round(time_dip - time_dist, 3))
     
     extreme_a = calc_alpha(dip_relation)
     
     end_time = time.perf_counter()
-    runtime = round(end_time - start_time, 3)
-    print(" Crit Alphas Calculated (s):", round(end_time - time_dip, 3))
+    runtime = np.round(end_time - start_time, 3)
+    print(" Crit Alphas Calculated (s):", np.round(end_time - time_dip, 3))
     print("\n", "Total Runtime (s):", runtime)
-    print(" Total Runtime (m):", round((end_time - start_time)/60, 3))
+    print(" Total Runtime (m):", np.round((end_time - start_time)/60, 3))
     print(" Extreme Alphas:", extreme_a)
     print("--------------------------------")
     

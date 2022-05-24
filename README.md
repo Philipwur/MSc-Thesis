@@ -26,7 +26,6 @@ polarising.
 
 ### Working on now
 
-- First optimisation surface plot (rough one)
 - Think about the boundary conditions of the coordinate system
   - e.g. equivalent lattices generated with different b' and thetas
   - periodicty garuanteed at 2pi 
@@ -44,16 +43,21 @@ significantly improve runtimes)
 - start thinking about Nc calculation from alpha
 - see 1/N^gamma variant of variable analysis
 - look into CUDA for optimisation procedure
+- make 2D model work with array inputs (for multi-threading)
+
 
 ### Extras
 
 - Look into Julia
 - change print commands to logging
 - add points and interceptions to legend in regression graphs
+- add resolution/subtitles in surface/contour plot for final report
+- look into animating the 3D surface plot
 - look into enumerate and object oriented code (classes)
 - think about animating the regression relationship for the thesis presentation
 - see how results of a strip of lattice compare to squares (might be able to save computational time)
 - see if you can optimise the runtime for the 3D model
+
 
 ## Done
 
@@ -73,6 +77,7 @@ W1
   - Exact same results (should be able to leverage this for some time savings)
 - See if regression results hold up for different lattice parameters
   - Regression results hold up, but error range varies (0.666-0.4%)
+- First surface plots (both Nc and ac) (resolution of 64)
  
 ## Notes 
 
