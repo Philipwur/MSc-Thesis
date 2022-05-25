@@ -77,7 +77,8 @@ W0
 W1
 - started github/folder setup
 - Try Rahul's way of generating points without the modulo and compare 1/N
-  - Exact same results (should be able to leverage this for some time savings)
+  - Exact same results (should be able to leverage this for some time savings
+    and array OF acceptance) 
 - See if regression results hold up for different lattice parameters
   - Regression results hold up, but error range varies (0.666-0.4%)
 - First surface plots (both Nc and ac) (resolution of 64)
