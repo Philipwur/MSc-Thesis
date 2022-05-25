@@ -31,6 +31,7 @@ polarising.
   - periodicty garuanteed at 2pi 
   - look up irreducable balloon zone ("irreducable parameter space")
   - would be a lot easier to use lattice vectors for this purpose
+  - b'*cos(theta)<=1
 - Finish inital literature review - get to dipole-dipole matrix from scratch
 
 ### Later
