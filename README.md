@@ -46,6 +46,7 @@ significantly improve runtimes)
 - see 1/N^gamma variant of variable analysis
 - look into CUDA for optimisation procedure
 - make 2D model work with array inputs (for multi-threading)
+- create optimisation framework (pick optimiser)
 
 
 ### Extras
