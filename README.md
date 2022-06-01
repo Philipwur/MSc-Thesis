@@ -83,6 +83,9 @@ W1
   - Regression results hold up, but error range varies (0.666-0.4%)
 - First surface plots (both Nc and ac) (resolution of 64)
  
+W2
+- tested speed of vector lattice generation method (is about 225% faster with lattice vectors)
+
 ## Notes 
 
 just random stuff for me, not rigourously checked

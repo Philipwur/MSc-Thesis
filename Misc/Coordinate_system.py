@@ -1,10 +1,12 @@
 #%%
 """
 Showing off how pog the the coordinate generation is
+3 types of generation include modulo (box), slant, and vector slant
 """
 
 import math
 import numpy as np
+from timeit import default_timer as timer
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -44,7 +46,11 @@ def generate_lattice(Nx, Ny, b_dash, theta, tot_atoms):
        
     return points
 
+start = timer()
 points = generate_lattice(Nx, Ny, b_dash, theta, tot_atoms)
+end = timer()
+print(end- start)
+
 
 #%% slanted generation
 
@@ -72,8 +78,31 @@ def generate_lattice(lat_size, b_dash, theta, tot_atoms):
 
     return points
 
+start = timer()
 points = generate_lattice(Nx, b_dash, theta, tot_atoms)
+end = timer()
+print(end- start)
+#%% vector slant
 
+v1 = (1, 0)
+v2 = (0.3, 1)
+
+def vector_gen(v1, v2, Nx):
+    proto_x = np.arange(0, v1[0]*Nx, v1[0])
+    proto_y = np.arange(0, v2[1]*Nx, v2[1])
+
+    xm, ym = np.meshgrid(proto_x, proto_y)
+
+    xm = xm + np.arange(0, v2[0]*Nx, v2[0])[:,None]
+
+    points = np.column_stack([xm.ravel(), ym.ravel()]) 
+    
+    return points
+
+start = timer()
+points = vector_gen(v1, v2, Nx)
+end = timer()
+print(end- start)
 #%% plotting coordinates for inspection
 
 plt.figure(dpi = 300)
@@ -86,6 +115,7 @@ plt.suptitle("Full Lattice",
 plt.title((r"b' : {},   $\theta$ : {}°,   N = {}".format(b_dash, 
                                                          math.degrees(theta), 
                                                          Nx)), 
+
           fontsize = 12)
 
 plt.xlabel("x")
