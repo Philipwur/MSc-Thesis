@@ -1,3 +1,4 @@
+#%%
 # -*- coding: utf-8 -*-
 import time
 import math
@@ -19,45 +20,33 @@ a, b = 1, 1 (b':1, θ=90)
 
 #variables defined here
 
-#lattice spacing
-b_dash = 1
-
-#angle between planes
-theta = math.pi / 2
+#lattice vectors
+v1 = (1, 0)
+v2 = (0, 1)
 
 #lattice resolution (how many atoms in x and y directions)
-lat_size = 40
+lat_size = 29
 
 
 #functions defined here
 
-#initialises entire rows of the lattice at once
-def single_row(b_dash, theta, j, lat_size):
+# generates entire lattice and then slants it by v2
+def vector_gen(v1, v2, latsize, tot_atoms):
     
-    x_term = np.round((b_dash * np.cos(theta) * j) % 1, 5)
-    y_term = j * (np.round(b_dash * np.sin(theta), 5))
+    proto_x = np.linspace(0, v1[0]*latsize, latsize)
+    proto_y = np.linspace(0, v2[1]*latsize, latsize)
     
-    x_row = np.arange(x_term, lat_size * 1, 1)
-    y_row = np.repeat(y_term, lat_size)
-    
-    return np.column_stack((x_row, y_row))
+    xm, ym = np.meshgrid(proto_x, proto_y)
 
-
-#Generates the lattice by appending entire layers of the lattice at once, then calculates distance matrix
-def generate_lattice(lat_size, b_dash, theta, tot_atoms):
+    try:
+        xm = xm + np.linspace(0, v2[0]*latsize, latsize)[:,None]
     
-    points = np.empty([0, 2])
+    finally:
+        points = np.column_stack([xm.ravel(), ym.ravel()]) 
+        
+        dist = distance_matrix(points, points) + np.identity(tot_atoms)
     
-    #appending x row along y axis
-    for j in range(lat_size):
-        points = np.append(points, 
-                           single_row(b_dash, theta, j, lat_size), 
-                           axis = 0
-                           )
-    
-    dist = distance_matrix(points, points) + np.identity(tot_atoms)
-    
-    return points, dist
+        return points, dist
 
 
 # function for calculating the dipole-dipole relation matrix
@@ -91,41 +80,41 @@ def calc_alpha(dip_relation):
 # =============================================================================
 
 #master function, containing excecution order and print commands
-def run_sim(b_dash, theta, lat_size):
+def run_sim(v1, v2, lat_size):
     
-    print("--------------------------------")
-    print(" Variables:")
-    print(" b':", b_dash)
-    print(" θ:", np.round(theta, 4))
-    print(" Lattice resolution: {0} by {0}".format(lat_size))
+    # print("--------------------------------")
+    # print(" Variables:")
+    # print(" v1:", v1)
+    # print(" v2:", v2)
+    # print(" Lattice resolution: {0} by {0}".format(lat_size))
     
     start_time = time.perf_counter()
     
     tot_atoms = (lat_size ** 2)
     
-    points, dist = generate_lattice(lat_size, b_dash, theta, tot_atoms)
+    points, dist = vector_gen(v1, v2, lat_size, tot_atoms)
     
     time_dist = time.perf_counter()
-    print("\n", "Distance Matrix Created (s):", np.round(time_dist - start_time, 3))
+    # print("\n", "Distance Matrix Created (s):", np.round(time_dist - start_time, 3))
     
     dip_relation = generate_dip_relation(tot_atoms, dist)
     
     time_dip = time.perf_counter()
-    print(" Dipole Matrix Created (s):", np.round(time_dip - time_dist, 3))
+    # print(" Dipole Matrix Created (s):", np.round(time_dip - time_dist, 3))
     
     extreme_a = calc_alpha(dip_relation)
     
     end_time = time.perf_counter()
     runtime = np.round(end_time - start_time, 3)
-    print(" Crit Alphas Calculated (s):", np.round(end_time - time_dip, 3))
-    print("\n", "Total Runtime (s):", runtime)
-    print(" Total Runtime (m):", np.round((end_time - start_time)/60, 3))
-    print(" Extreme Alphas:", extreme_a)
-    print("--------------------------------")
+    # print(" Crit Alphas Calculated (s):", np.round(end_time - time_dip, 3))
+    # print("\n", "Total Runtime (s):", runtime)
+    # print(" Total Runtime (m):", np.round((end_time - start_time)/60, 3))
+    # print(" Extreme Alphas:", extreme_a)
+    # print("--------------------------------")
     
     return extreme_a
 
 
 if __name__ == "__main__":
     
-    alpha = run_sim(b_dash, theta, lat_size)
+    alpha = run_sim(v1, v2, lat_size)
