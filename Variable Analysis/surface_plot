@@ -16,59 +16,92 @@ import Dipole_Dipole_2D_1D as fun
 
 steps = 64
 
-start_b = 1
-end_b = 3
-start_t = math.pi/8
-end_t = math.pi/2
+start_x = 0
+end_x = 3
+start_y = 0.5
+end_y = 1.5
 
+
+v1 = (1, 0)
 # =============================================================================
 #%%
-def objective_function(b_dash, theta):
+def objective_function(v1, v2):
     
     #based on term 11 and 12
     x = (1/27, 1/29)
-    y = (fun.run_sim(b_dash, theta, 27)[0], fun.run_sim(b_dash, theta, 29)[0])
+    y = (fun.run_sim(v1, v2, 27)[0], fun.run_sim(v1, v2, 29)[0])
 
     alpha = round(linregress(x, y).intercept, 5)
     
     # objective density function
-    nc = np.divide((abs(alpha) ** (2/3)), (b_dash * math.sin(theta)))
+    nc = np.divide((abs(alpha) ** (2/3)), (v2[1]))
     return nc
 
-x = np.arange(start_b, end_b, (end_b-start_b)/steps)
-y = np.arange(start_t, end_t, (end_t-start_t)/steps)
+x = np.arange(start_x, end_x, (end_x-start_x)/steps)
+y = np.arange(start_y, end_y, (end_y-start_y)/steps)
 xx, yy = np.round(np.meshgrid(x, y), 5)
 
 z = np.empty((len(xx), len(xx)))
 
 for i in range(len(xx)):
     for j in range(len(xx)):
-        z[i][j] = objective_function(xx[i][j], yy[i][j])
+        v2 = (xx[i][j], yy[i][j])
+        z[i][j] = objective_function(v1, v2)
 
-#%%
+#%% ac graphing
 
 fig = plt.figure(dpi = 300)
 ax = fig.gca(projection="3d")
 
-surf = ax.plot_surface(xx, np.degrees(yy), z, cmap = "viridis")
+surf = ax.plot_surface(xx, yy, z, cmap = "viridis")
 ax.zaxis.set_rotate_label(False)
 ax.yaxis.set_rotate_label(False)
-ax.set_xlabel("b'")
-ax.set_ylabel(r"$\theta$")
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.set_zlabel(r"$\alpha_{c-}^{'}$")
+ax.zaxis.labelpad = 5
+cbar = fig.colorbar(surf, pad = 0.15)
+plt.suptitle(r"$\alpha_{c-}^{'}$ with x and y vector components", y = 1)
+plt.title("Resolution = 32",  fontsize = 10, x = 0.67, y = 1.1)
+ax.view_init(-130, 45)
+plt.show()
+
+fig2, ax = plt.subplots(dpi = 300)
+cp = ax.contourf(xx, yy, z)
+cbar2 = fig2.colorbar(cp)
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+plt.suptitle(r"$\alpha_{c-}^{'}$ with x and y vector components", y = 1.00)
+plt.title("Resolution = 32",  fontsize = 10, x = 0.60)
+cbar2.ax.get_yaxis().labelpad = 10
+cbar2.ax.set_ylabel(r"$\alpha_{c-}^{'}$")
+plt.show()
+
+#%% Nc graphing
+
+fig = plt.figure(dpi = 300)
+ax = fig.gca(projection="3d")
+
+surf = ax.plot_surface(xx, yy, z, cmap = "viridis")
+ax.zaxis.set_rotate_label(False)
+ax.yaxis.set_rotate_label(False)
+ax.set_xlabel("x")
+ax.set_ylabel("y")
 ax.set_zlabel(r"$N_{c-}^{'}$")
 ax.zaxis.labelpad = 5
 cbar = fig.colorbar(surf, pad = 0.15)
-plt.suptitle(r"$N_{c-}^{'}$ with b' and $\theta$", y = 1)
+plt.suptitle(r"$N_{c-}^{'}$ with x and y vector components", y = 1)
 plt.title("Resolution = 64",  fontsize = 10, x = 0.67, y = 1.1)
 ax.view_init(-130, 45)
 plt.show()
 
 fig2, ax = plt.subplots(dpi = 300)
-cp = ax.contourf(xx, np.degrees(yy), z)
+clev = np.arange(z.min(), z.max(),.002)
+cp = ax.contourf(xx, yy, z, clev, extend = 'both')
 cbar2 = fig2.colorbar(cp)
-ax.set_xlabel("b'")
-ax.set_ylabel(r"$\theta$")
-plt.suptitle(r"$N_{c-}^{'}$ with b' and $\theta$", y = 1.00)
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+plt.suptitle(r"$N_{c-}^{'}$ with x and y vector components", y = 1.00)
 plt.title("Resolution = 64",  fontsize = 10, x = 0.60)
 cbar2.ax.get_yaxis().labelpad = 10
 cbar2.ax.set_ylabel(r"$N_{c-}^{'}$")

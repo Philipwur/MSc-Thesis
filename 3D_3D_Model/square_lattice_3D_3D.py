@@ -22,6 +22,9 @@ develop code 1D-2D for lattice for 1D polarizability (square lattice) (term 1 wo
 relation matrix will be NxN rather than 3N*3N
 then go to hexagonal structure
 
+needs a significant rewrite
+look into the numpy function memmap for the generation of large datapoints 
+or sparse arrays
 """
 
 a, b, c = 2, 2, 2

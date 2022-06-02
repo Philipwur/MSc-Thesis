@@ -92,10 +92,12 @@ def vector_gen(v1, v2, Nx):
     proto_y = np.arange(0, v2[1]*Nx, v2[1])
 
     xm, ym = np.meshgrid(proto_x, proto_y)
-
-    xm = xm + np.arange(0, v2[0]*Nx, v2[0])[:,None]
-
-    points = np.column_stack([xm.ravel(), ym.ravel()]) 
+    
+    try:
+        xm = xm + np.arange(0, v2[0]*Nx, v2[0])[:,None]
+    
+    finally:
+        points = np.column_stack([xm.flatten(), ym.flatten()]) 
     
     return points
 
@@ -103,6 +105,7 @@ start = timer()
 points = vector_gen(v1, v2, Nx)
 end = timer()
 print(end- start)
+
 #%% plotting coordinates for inspection
 
 plt.figure(dpi = 300)
