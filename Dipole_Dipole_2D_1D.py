@@ -76,17 +76,18 @@ def calc_alpha(dip_relation):
     return np.round(extreme_a, 5)
 
 # =============================================================================
-# add logging here
+# add logging here, or change print commands to update instead of create new ones
+# tqdm module for loading bar
 # =============================================================================
 
 #master function, containing excecution order and print commands
 def run_sim(v1, v2, lat_size):
     
-    # print("--------------------------------")
-    # print(" Variables:")
-    # print(" v1:", v1)
-    # print(" v2:", v2)
-    # print(" Lattice resolution: {0} by {0}".format(lat_size))
+    print("--------------------------------")
+    print(" Variables:")
+    print(" v1:", v1)
+    print(" v2:", v2)
+    print(" Lattice resolution: {0} by {0}".format(lat_size))
     
     start_time = time.perf_counter()
     
@@ -95,26 +96,26 @@ def run_sim(v1, v2, lat_size):
     points, dist = vector_gen(v1, v2, lat_size, tot_atoms)
     
     time_dist = time.perf_counter()
-    # print("\n", "Distance Matrix Created (s):", np.round(time_dist - start_time, 3))
+    print("\n", "Distance Matrix Created (s):", np.round(time_dist - start_time, 3))
     
     dip_relation = generate_dip_relation(tot_atoms, dist)
     
     time_dip = time.perf_counter()
-    # print(" Dipole Matrix Created (s):", np.round(time_dip - time_dist, 3))
+    print(" Dipole Matrix Created (s):", np.round(time_dip - time_dist, 3))
     
     extreme_a = calc_alpha(dip_relation)
     
     end_time = time.perf_counter()
     runtime = np.round(end_time - start_time, 3)
-    # print(" Crit Alphas Calculated (s):", np.round(end_time - time_dip, 3))
-    # print("\n", "Total Runtime (s):", runtime)
-    # print(" Total Runtime (m):", np.round((end_time - start_time)/60, 3))
-    # print(" Extreme Alphas:", extreme_a)
-    # print("--------------------------------")
+    print(" Crit Alphas Calculated (s):", np.round(end_time - time_dip, 3))
+    print("\n", "Total Runtime (s):", runtime)
+    print(" Total Runtime (m):", np.round((end_time - start_time)/60, 3))
+    print(" Extreme Alphas:", extreme_a)
+    print("--------------------------------")
     
-    return extreme_a
+    return extreme_a, points
 
 
 if __name__ == "__main__":
     
-    alpha = run_sim(v1, v2, lat_size)
+    alpha, points = run_sim(v1, v2, lat_size)

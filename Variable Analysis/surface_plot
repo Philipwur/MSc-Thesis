@@ -14,7 +14,7 @@ import Dipole_Dipole_2D_1D as fun
 # =============================================================================
 #hyperparameters
 
-steps = 64
+steps = 32
 
 start_x = 0
 end_x = 3

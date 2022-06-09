@@ -3,11 +3,21 @@ import math
 import numpy as np
 import numpy.linalg as la
 from scipy.spatial import distance_matrix
-import time
 
-start_time = time.perf_counter()
 #import my_functions as fun
 
+#lattice vectors
+v1 = (1, 0, 0)
+v2 = (0, 1, 0)
+v3 = (0, 0, 1)
+
+#lattice resolution
+lat_res = 5
+
+#total atom count
+tot_atoms = np.power(lat_res, 3)
+
+#%%
 """
 develop code 1D-2D for lattice for 1D polarizability (square lattice) (term 1 wouldnt be there, mostly term)
 relation matrix will be NxN rather than 3N*3N
@@ -19,7 +29,7 @@ or sparse arrays
 """
 
 a, b, c = 2, 2, 2
-Nx, Ny, Nz = 3, 3, 3
+Nx, Ny, Nz = 5, 5, 5
 
 #a, b, c = fun.spacing_choice()
 #Nx, Ny, Nz = fun.resolution_choice()
@@ -27,24 +37,21 @@ Nx, Ny, Nz = 3, 3, 3
 #calculating total amount of atoms for the SC
 tot_atoms = (Nx * Ny * Nz)
 
-
 #setting up zero arrays 
 relation = np.zeros((3*tot_atoms, 3*tot_atoms))
 E0 = np.zeros((3 * tot_atoms, 1)) #electric field array
 p = np.zeros((3 * tot_atoms, 1)) #dipole moment list
 
 #Assigning the coordinates of the SC atoms (present in all lattices)
-points = np.array([[i * a, j * b, k * c] 
-                   for k in range(Nz) 
-                   for j in range(Ny) 
-                   for i in range(Nx)])
+points = [[i * a, j * b, k * c] 
+           for k in range(Nz) 
+           for j in range(Ny) 
+           for i in range(Nx)]
 
-t1 = time.perf_counter()
-print("points created:", round(t1-start_time,5))
 #Calculating Eucledian distances between each point
-euc = distance_matrix(points, points) + np.identity(tot_atoms)
-t2 = time.perf_counter()
-print("distance matrix:", round(t2-t1,5))
+euc = distance_matrix(points, points)
+
+euc = euc + np.identity(tot_atoms)
 
 #Calculating dipole-dipole relation matrix
 for i in range(0, 3 * tot_atoms):
@@ -80,8 +87,6 @@ for i in range(0, 3 * tot_atoms):
         if np.mod(j1, 3) == 0:
             count += 1
 
-t3 = time.perf_counter()
-print("dipole matrix:", round(t3-t2,5))
 #finding the extremes of the dipole-relation eigenvalues
 relation_eig = la.eigvalsh(relation)
 extreme_eig = [min(relation_eig), max(relation_eig)]
@@ -91,9 +96,3 @@ extreme_eig = [min(relation_eig), max(relation_eig)]
 extreme_a = [1/extreme_eig[0], 1/extreme_eig[1]]
 
 fig_o_merit = extreme_a[0]
-t4 = time.perf_counter()
-print("eigenvalue:", round(t4-t3,5))
-end_time = time.perf_counter()
-print("total:", round(end_time-start_time, 5))
-
-print("alpha:", fig_o_merit)
