@@ -26,13 +26,10 @@ polarising.
 
 ### Working on now
 
-- Think about the boundary conditions of the coordinate system
-  - e.g. equivalent lattices generated with different b' and thetas
-  - periodicty garuanteed at 2pi 
-  - look up irreducable balloon zone ("irreducable parameter space")
-  - would be a lot easier to use lattice vectors for this purpose
-  - b'*cos(theta)<=1
-- Finish inital literature review - get to dipole-dipole matrix from scratch
+- Continued literature review
+  + Figure of merit Nc (understand where the permitivity term comes from etc)
+  + eigenvalues review
+- optimise 3D-3D model for flynn
 
 - Start on rewrite of 3D-3D case (took 27by27 SC 50 minutes), 10 decimal places
 - read up on eigenvalues 
@@ -86,6 +83,11 @@ W1
   - Regression results hold up, but error range varies (0.666-0.4%)
 - First surface plots (both Nc and ac) (resolution of 64)
  
+W2
+- implemented the vector lattice generation method
+- tested speed of vector lattice generation method (is about 225% faster with lattice vectors)
+- tested irreducible parameter space using lattice vectors
+
 ## Notes 
 
 just random stuff for me, not rigourously checked

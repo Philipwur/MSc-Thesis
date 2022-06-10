@@ -3,6 +3,7 @@
 import time
 import math
 #import logging soon!
+# this version has b' and theta
 
 import numpy as np
 import scipy.linalg as la
@@ -20,33 +21,45 @@ a, b = 1, 1 (b':1, θ=90)
 
 #variables defined here
 
-#lattice vectors
-v1 = (1, 0)
-v2 = (0, 1)
+#lattice spacing
+b_dash = 1
+
+#angle between planes
+theta = math.pi / 2
 
 #lattice resolution (how many atoms in x and y directions)
-lat_size = 29
+lat_size = 100
 
 
 #functions defined here
 
-# generates entire lattice and then slants it by v2
-def vector_gen(v1, v2, latsize, tot_atoms):
+#initialises entire rows of the lattice at once
+def single_row(b_dash, theta, j, lat_size):
     
-    proto_x = np.linspace(0, v1[0]*latsize, latsize)
-    proto_y = np.linspace(0, v2[1]*latsize, latsize)
+    x_term = np.round((b_dash * np.cos(theta) * j) % 1, 5)
+    y_term = j * (np.round(b_dash * np.sin(theta), 5))
     
-    xm, ym = np.meshgrid(proto_x, proto_y)
+    x_row = np.arange(x_term, lat_size * 1, 1)
+    y_row = np.repeat(y_term, lat_size)
+    
+    return np.column_stack((x_row, y_row))
 
-    try:
-        xm = xm + np.linspace(0, v2[0]*latsize, latsize)[:,None]
+
+#Generates the lattice by appending entire layers of the lattice at once, then calculates distance matrix
+def generate_lattice(lat_size, b_dash, theta, tot_atoms):
     
-    finally:
-        points = np.column_stack([xm.ravel(), ym.ravel()]) 
-        
-        dist = distance_matrix(points, points) + np.identity(tot_atoms)
+    points = np.empty([0, 2])
     
-        return points, dist
+    #appending x row along y axis
+    for j in range(lat_size):
+        points = np.append(points, 
+                           single_row(b_dash, theta, j, lat_size), 
+                           axis = 0
+                           )
+    
+    dist = distance_matrix(points, points) + np.identity(tot_atoms)
+    
+    return points, dist
 
 
 # function for calculating the dipole-dipole relation matrix
@@ -76,24 +89,23 @@ def calc_alpha(dip_relation):
     return np.round(extreme_a, 5)
 
 # =============================================================================
-# add logging here, or change print commands to update instead of create new ones
-# tqdm module for loading bar
+# add logging here
 # =============================================================================
 
 #master function, containing excecution order and print commands
-def run_sim(v1, v2, lat_size):
+def run_sim(b_dash, theta, lat_size):
     
     print("--------------------------------")
     print(" Variables:")
-    print(" v1:", v1)
-    print(" v2:", v2)
+    print(" b':", b_dash)
+    print(" θ:", np.round(theta, 4))
     print(" Lattice resolution: {0} by {0}".format(lat_size))
     
     start_time = time.perf_counter()
     
     tot_atoms = (lat_size ** 2)
     
-    points, dist = vector_gen(v1, v2, lat_size, tot_atoms)
+    points, dist = generate_lattice(lat_size, b_dash, theta, tot_atoms)
     
     time_dist = time.perf_counter()
     print("\n", "Distance Matrix Created (s):", np.round(time_dist - start_time, 3))
@@ -113,9 +125,9 @@ def run_sim(v1, v2, lat_size):
     print(" Extreme Alphas:", extreme_a)
     print("--------------------------------")
     
-    return extreme_a, points
+    return extreme_a
 
 
 if __name__ == "__main__":
     
-    alpha, points = run_sim(v1, v2, lat_size)
+    alpha = run_sim(b_dash, theta, lat_size)
