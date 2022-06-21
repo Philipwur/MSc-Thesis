@@ -6,31 +6,35 @@ Created on Sun Jun  5 13:53:38 2022
 @author: Philipwur
 """
 
+import os
+
+os.environ["MKL_NUM_THREADS"] = "8"
+
 import time
-from matplotlib.font_manager import json_load
 import numpy as np
 
-
 import numpy.linalg as la
+
 import scipy.sparse as sp
-import scipy.sparse.linalg as sa
-from scipy.spatial import distance_matrix 
+import scipy.linalg as sa
 
-import numba as nb
-from numba import njit, prange
-from tqdm import tqdm
-from concurrent.futures import ThreadPoolExecutor
+from numba import njit
 
+import matlab
+import matlab.engine
+
+#from tqdm import tqdm
+
+#np.show_config()
 
 #%% no sparse matrix
 
 a = 2
-lat_res = 20
-start = time.perf_counter()
+lat_res = 27
 
-@njit(parallel = True)
+@njit()
 def dipole_dipole(a, lat_res):
-        
+    
     tot_atoms = (lat_res ** 3)
     relation = np.zeros((3 * tot_atoms, 3 * tot_atoms))
     
@@ -38,9 +42,9 @@ def dipole_dipole(a, lat_res):
     points = np.array([[i * a, j * a, k * a] 
                              for k in range(lat_res) 
                              for j in range(lat_res) 
-                             for i in range(lat_res)]).astype(np.float_)
+                             for i in range(lat_res)]).astype(np.float64)
     
-    for i in prange(0, 3 * tot_atoms):
+    for i in range(0, 3 * tot_atoms):
         
         x1 = i % 3
         x2 = i // 3
@@ -48,7 +52,7 @@ def dipole_dipole(a, lat_res):
         p1 = points[x2]
         p2 = points[x2][x1]
         
-        for j in prange(0, i):
+        for j in range(0, i):
             
             y1 = j % 3
             y2 = j // 3
@@ -61,31 +65,111 @@ def dipole_dipole(a, lat_res):
             
             euc = la.norm(p1 - points[y2]) if x2 != y2 else 1 
             
-            relation[i, j] = (term1 - kron * euc * euc) / (euc ** 5)
+            relation[i][j] = (term1 - kron * euc * euc) / (euc ** 5)
     
     return relation
 
-relation = dipole_dipole(a, lat_res)
-    
-relation = relation + relation.T
 
-@njit
-def get_alpha(relation):
+def find_alpha(relation):
     
-    alphac = 1/(min(la.eigvalsh(relation)))
     
-    return alphac
+    relation_eig = la.eigvalsh(relation, UPLO = "L")
+    
+    alpha = 1 / relation_eig[0]
+    
+    return alpha
 
-alphac = get_alpha(relation)
 
-print("alpha:", alphac)
-end = time.perf_counter()
-print("time - h:", (end - start)/(60*60))
-print("time - m:", (end - start)/(60))
-print("time - s:", (end - start))
-print("array size:", relation.data.nbytes/(1024*1024*1024))
+def main(a, lat_res):
+    
+    relation = dipole_dipole(a, lat_res)
+    
+    print("array size:", relation.data.nbytes/(1024*1024*1024))
+    
+    alpha = find_alpha(relation)
+    
+    return alpha
+
+
+if __name__ == "__main__":
+    
+    start = time.perf_counter()
+    
+    alpha = main(a, lat_res)
+    
+    end = time.perf_counter()
+    
+    print("alpha:", alpha)
+    print("time - h:", (end - start)/(60*60))
+    print("time - m:", (end - start)/(60))
+    print("time - s:", (end - start))
+
+
+#%% compare numpy, numpy + numba and scipy times
+
+
+def alpha1(relation):
+    
+    relation_eig = la.eigvalsh(relation, UPLO = "L")
+    
+    alpha = 1 / relation_eig[0]
+    
+    print(alpha)
+    
+    return alpha
+
+
+@njit()
+def alpha2(relation):
+    
+    #relation = relation + relation.T
+    
+    relation_eig = la.eigvalsh(relation)
+    
+    alpha = 1 / relation_eig[0]
+    print(alpha)
+    return alpha
+
+
+def alpha3(relation):
+    
+    relation_eig = sa.eigh(relation,
+                           eigvals_only = True,
+                           overwrite_a = True,
+                           overwrite_b = True,
+                           check_finite = False,
+                           driver = "evd"
+                           )
+    
+    alpha = 1/relation_eig[0]
+    print(alpha)
+
+    return alpha
+
+
+test_relation = dipole_dipole(2, 15)
+
+tic = time.perf_counter()
+_ = alpha1(test_relation)
+toc = time.perf_counter()
+
+print("alpha1:",toc-tic)
+
+tic = time.perf_counter()
+_ = alpha2(test_relation)
+toc = time.perf_counter()
+
+print("alpha2:",toc-tic)
+
+tic = time.perf_counter()
+_ = alpha3(test_relation)
+toc = time.perf_counter()
+
+print("alpha3:",toc-tic)
 
 #%% sparse matrix
+
+#try copying above structure but with object mode for final appending action
 
 a, b, c = 2, 2, 2
 lat_res = 10
@@ -94,8 +178,10 @@ start = time.perf_counter()
 #calculating total amount of atoms for the SC
 tot_atoms = (lat_res ** 3)
 
-relation = sp.lil_matrix(np.zeros((3, 3)))
-relation.resize(3 * tot_atoms, 3 * tot_atoms)
+
+relation = np.zeros((3 * tot_atoms, 3 * tot_atoms))
+#relation = sp.lil_matrix(np.zeros((3, 3)))
+#relation.resize(3 * tot_atoms, 3 * tot_atoms)
 
 #Assigning the coordinates of the SC atoms (present in all lattices)
 points = np.array([[i * a, j * b, k * c] 
@@ -103,7 +189,7 @@ points = np.array([[i * a, j * b, k * c]
                    for j in range(lat_res) 
                    for i in range(lat_res)])
 
-@njit(nogil = True)
+@njit()
 def col_prep(i, points):
     
     x1 = i % 3
@@ -114,7 +200,7 @@ def col_prep(i, points):
     
     return x1, x2, p1, p2
 
-@njit(nogil = True)
+@njit()
 def point_prep(i, j, points, p1, p2, x1, x2):
     
     y1 = j % 3
@@ -169,8 +255,10 @@ start = time.perf_counter()
 #calculating total amount of atoms for the SC
 tot_atoms = (lat_res ** 3)
 
-relation = sp.lil_matrix(np.zeros((3, 3)))
-relation.resize(3 * tot_atoms, 3 * tot_atoms)
+relation = np.empty((3 * tot_atoms, 3 * tot_atoms))
+
+#relation = sp.lil_matrix(np.zeros((3, 3)))
+#relation.resize(3 * tot_atoms, 3 * tot_atoms)
 
 #Assigning the coordinates of the SC atoms (present in all lattices)
 points = np.array([[i * a, j * b, k * c] 
@@ -232,10 +320,10 @@ start = time.perf_counter()
 tot_atoms = (lat_res ** 3)
 
 
-#relation = np.zeros((3 * tot_atoms, 3 * tot_atoms))
+relation = np.zeros((3 * tot_atoms, 3 * tot_atoms))
 
-relation = sp.lil_matrix(np.zeros((3, 3)))
-relation.resize(3 * tot_atoms, 3 * tot_atoms)
+#relation = sp.lil_matrix(np.zeros((3, 3)))
+#relation.resize(3 * tot_atoms, 3 * tot_atoms)
 
 #Assigning the coordinates of the SC atoms (present in all lattices)
 points = np.array([[i * a, j * b, k * c] 
@@ -301,3 +389,5 @@ print("time - h:", (end - start)/(60*60))
 print("time - m:", (end - start)/(60))
 print("time - s:", (end - start))
 print("array size:", relation.data.nbytes/(1024*1024*1024))
+
+
