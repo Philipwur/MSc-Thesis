@@ -31,6 +31,9 @@ polarising.
   + eigenvalues review
 - optimise 3D-3D model for flynn
 
+- Start on rewrite of 3D-3D case (took 27by27 SC 50 minutes), 10 decimal places
+- read up on eigenvalues 
+
 ### Later
 
 - change linalg into numpy variant and add numba to all functions (should 
