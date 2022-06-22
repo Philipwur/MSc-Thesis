@@ -28,24 +28,15 @@ polarising.
 
 - Continued literature review
   + Figure of merit Nc (understand where the permitivity term comes from etc)
-  + eigenvalues review
-- optimise 3D-3D model for flynn
 
-- Start on rewrite of 3D-3D case (took 27by27 SC 50 minutes), 10 decimal places
-- read up on eigenvalues 
+- start making optimisation algo
+- get results on the cluster
 
 ### Later
 
-- change linalg into numpy variant and add numba to all functions (should 
-significantly improve runtimes)
-  + compare Scipy distance matrix to np broadcasting method with numba
-  + see week1 of deep learning module for info on broadcasting
-  + link: https://bit.ly/3kpsAdO
-- alternative to numba is to call a fortran/MATLAB function
 - start thinking about Nc calculation from alpha
 - see 1/N^gamma variant of variable analysis
 - look into CUDA for optimisation procedure
-- make 2D model work with array inputs (for multi-threading)
 - create optimisation framework (pick optimiser)
 
 
@@ -88,6 +79,14 @@ W2
 - tested speed of vector lattice generation method (is about 225% faster with lattice vectors)
 - tested irreducible parameter space using lattice vectors
 
+w3
+- optimised runtime of 3D-3D
+- ran benchmarks
+- calculating high resolution sims
+- thought about parallelism
+  - there is no reason for there to be perfect periodicity because the key element in calculating the alpha is the euclidian distance between points. When you distort the lattice to that extent, the average distance between the points will increase, which in turn will lower the alpha. The critical density calculation is not the problem. 
+- read up on eigenvalues 
+- do average distance calculation for x = 0.5 and x = 1.5 etc
 ## Notes 
 
 just random stuff for me, not rigourously checked
