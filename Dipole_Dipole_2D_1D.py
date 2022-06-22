@@ -5,7 +5,9 @@ import math
 #import logging soon!
 
 import numpy as np
-import scipy.linalg as la
+import numpy.linalg as la
+
+from numba import njit
 from scipy.spatial import distance_matrix
 
 #import my_functions as fun (no use for this atm)
@@ -25,7 +27,7 @@ v1 = (1, 0)
 v2 = (0, 1)
 
 #lattice resolution (how many atoms in x and y directions)
-lat_size = 29
+lat_size = 27
 
 
 #functions defined here
@@ -50,6 +52,7 @@ def vector_gen(v1, v2, latsize, tot_atoms):
 
 
 # function for calculating the dipole-dipole relation matrix
+@njit()
 def generate_dip_relation(tot_atoms, euc):
     
     # term 1 dissapears due to perpendicularity, division is simplified to -3 power
@@ -62,18 +65,11 @@ def generate_dip_relation(tot_atoms, euc):
 #finding the extremes of the dipole-relation eigenvalues
 def calc_alpha(dip_relation):
     
-    #ev and evd were found to be most appropriate, ev working better at low N and evd at high N
-    relation_eig = la.eigh(dip_relation,
-                           eigvals_only = True,
-                           overwrite_a = True,
-                           overwrite_b = True,
-                           check_finite = False,
-                           driver = "evd"
-                           )
+    relation_eig = la.eigvalsh(dip_relation)
     
-    extreme_a = [1/relation_eig[0], 1/relation_eig[-1]]
+    alpha = 1 / relation_eig[0]
 
-    return np.round(extreme_a, 5)
+    return np.round(alpha, 5)
 
 # =============================================================================
 # add logging here, or change print commands to update instead of create new ones
