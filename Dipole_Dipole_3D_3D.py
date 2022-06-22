@@ -1,3 +1,4 @@
+#%%
 # -*- coding: utf-8 -*-
 """
 Created on Tue Jun 12 13:56:52 2022
@@ -13,25 +14,62 @@ from numba import njit
 
 #hyperparameters
 
-a = 2  #space between atoms in sc
-lat_res = 5 #lattice resolution
-
+lat_type = "SC"  #"FCC" and "BCC", anything other than FCC or BCC is assumed to be SC
+lat_res = 10 #lattice resolution
 
 
 @njit()
-def dipole_dipole(a, lat_res):
-    
-    tot_atoms = (lat_res ** 3)
-    
-    #preallocation
-    relation = np.zeros((3 * tot_atoms, 3 * tot_atoms))
+def dipole_dipole(lat_type, lat_res):
     
     #Assigning the coordinates of the SC atoms (present in all lattices)
     #this can be sped up but doesnt take much time in the grand scheme of things
-    points = np.array([[i * a, j * a, k * a] 
-                             for k in range(lat_res) 
-                             for j in range(lat_res) 
-                             for i in range(lat_res)]).astype(np.float64)
+    points = np.array([[i, j, k] 
+                       for k in range(lat_res) 
+                       for j in range(lat_res) 
+                       for i in range(lat_res)]).astype(np.float64)
+
+    if lat_type == "FCC":
+
+        extra_points = np.array([[i + 0.5, j + 0.5, k] 
+                                for k in range(lat_res) 
+                                for j in range(lat_res - 1) 
+                                for i in range(lat_res - 1)]).astype(np.float64)
+
+        points = np.concatenate((points, extra_points))
+
+        extra_points = np.array([[i, j + 0.5, k + 0.5] 
+                            for k in range(lat_res - 1) 
+                            for j in range(lat_res - 1) 
+                            for i in range(lat_res)]).astype(np.float64)
+
+        points = np.concatenate((points, extra_points))
+
+        extra_points = np.array([[i + 0.5, j, k + 0.5] 
+                            for k in range(lat_res - 1) 
+                            for j in range(lat_res) 
+                            for i in range(lat_res - 1)]).astype(np.float64)
+
+        points = np.concatenate((points, extra_points))
+
+        extra_points = None
+
+    if lat_type == "BCC":
+
+        extra_points = np.array([[i + 0.5, j + 0.5, k + 0.5] 
+                                for k in range(lat_res - 1) 
+                                for j in range(lat_res - 1) 
+                                for i in range(lat_res - 1)]).astype(np.float64)
+
+        points = np.concatenate((points, extra_points))
+
+        extra_points = None    
+    
+    tot_atoms = len(points)
+
+    print("atoms:",  len(points))
+    
+    #preallocation
+    relation = np.zeros((3 * tot_atoms, 3 * tot_atoms))
     
     #calulating the dipole-dipole relation without any stored arrays for kron or euc to save RAM
     for i in range(0, 3 * tot_atoms):
@@ -70,9 +108,9 @@ def find_alpha(relation):
     return alpha
 
 
-def main(a, lat_res):
+def main(lat_type, lat_res):
     
-    relation = dipole_dipole(a, lat_res)
+    relation = dipole_dipole(lat_type, lat_res)
     
     #print("array size:", relation.data.nbytes/(1024*1024*1024))
     
@@ -83,18 +121,23 @@ def main(a, lat_res):
 
 if __name__ == "__main__":
     
-    start = time.perf_counter()
     
     _ = main(2, 5) #warmup function to get the main function compiled
     
     del _
     
-    alpha = main(a, lat_res) #actual high resolution simulation
+    start = time.perf_counter()
+    
+    alpha = main(lat_type, lat_res) #actual high resolution simulation
     
     end = time.perf_counter()
     
     #stats
+    print("type:", lat_type)
     print("alpha:", alpha)
     print("time - h:", (end - start)/(60*60))
     print("time - m:", (end - start)/(60))
     print("time - s:", (end - start))
+    
+#%%
+

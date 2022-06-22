@@ -20,30 +20,35 @@ import scipy.linalg as sa
 
 from numba import njit
 
-import matlab
-import matlab.engine
-
-#from tqdm import tqdm
-
-#np.show_config()
+import matplotlib.pyplot as plt
+import plotly
+import plotly.graph_objs as go
 
 #%% no sparse matrix
 
-a = 2
-lat_res = 27
+lat_type = "SC"  #choice between SC, FCC and BCC, anything other than FCC or BCC is assumed to be SC
+lat_res = 10 #lattice resolution
+
 
 @njit()
-def dipole_dipole(a, lat_res):
+def dipole_dipole(lat_type, lat_res):
     
     tot_atoms = (lat_res ** 3)
+    
+    #preallocation
     relation = np.zeros((3 * tot_atoms, 3 * tot_atoms))
     
     #Assigning the coordinates of the SC atoms (present in all lattices)
-    points = np.array([[i * a, j * a, k * a] 
-                             for k in range(lat_res) 
-                             for j in range(lat_res) 
-                             for i in range(lat_res)]).astype(np.float64)
+    #this can be sped up but doesnt take much time in the grand scheme of things
+    points = np.array([[i, j, k] 
+                       for k in range(lat_res) 
+                       for j in range(lat_res) 
+                       for i in range(lat_res)]).astype(np.float64)
     
+    if lat_type == "FCC":
+        extra_points = points[1:,1:,1:] + 0.5
+    
+    #calulating the dipole-dipole relation without any stored arrays for kron or euc to save RAM
     for i in range(0, 3 * tot_atoms):
         
         x1 = i % 3
@@ -52,6 +57,7 @@ def dipole_dipole(a, lat_res):
         p1 = points[x2]
         p2 = points[x2][x1]
         
+        #only calculates lower triangular for the symmetric hermetic matrix
         for j in range(0, i):
             
             y1 = j % 3
@@ -69,9 +75,8 @@ def dipole_dipole(a, lat_res):
     
     return relation
 
-
+#finds alpha from the lower tril of the symmetric matrix
 def find_alpha(relation):
-    
     
     relation_eig = la.eigvalsh(relation, UPLO = "L")
     
@@ -84,7 +89,7 @@ def main(a, lat_res):
     
     relation = dipole_dipole(a, lat_res)
     
-    print("array size:", relation.data.nbytes/(1024*1024*1024))
+    #print("array size:", relation.data.nbytes/(1024*1024*1024))
     
     alpha = find_alpha(relation)
     
@@ -93,17 +98,115 @@ def main(a, lat_res):
 
 if __name__ == "__main__":
     
+    
+    _ = main(2, 5) #warmup function to get the main function compiled
+    
+    del _
+    
     start = time.perf_counter()
     
-    alpha = main(a, lat_res)
+    alpha = main(a, lat_res) #actual high resolution simulation
     
     end = time.perf_counter()
     
+    #stats
     print("alpha:", alpha)
     print("time - h:", (end - start)/(60*60))
     print("time - m:", (end - start)/(60))
     print("time - s:", (end - start))
 
+
+#%%
+
+lat_type = "FCC"  #"FCC" and "BCC", anything other than FCC or BCC is assumed to be SC
+lat_res = 3 #lattice resolution
+    
+
+
+#Assigning the coordinates of the SC atoms (present in all lattices)
+#this can be sped up but doesnt take much time in the grand scheme of things
+points = np.array([[i, j, k] 
+                    for k in range(lat_res) 
+                    for j in range(lat_res) 
+                    for i in range(lat_res)]).astype(np.float64)
+
+tot_atoms = len(points)
+
+#preallocation
+relation = np.zeros((3 * tot_atoms, 3 * tot_atoms))
+
+if lat_type == "FCC":
+    
+    extra_points = np.array([[i + 0.5, j + 0.5, k] 
+                             for k in range(lat_res) 
+                             for j in range(lat_res - 1) 
+                             for i in range(lat_res - 1)]).astype(np.float64)
+    
+    points = np.concatenate((points, extra_points))
+    
+    extra_points = np.array([[i, j + 0.5, k + 0.5] 
+                            for k in range(lat_res - 1) 
+                            for j in range(lat_res - 1) 
+                            for i in range(lat_res)]).astype(np.float64)
+    
+    points = np.concatenate((points, extra_points))
+    
+    extra_points = np.array([[i + 0.5, j, k + 0.5] 
+                            for k in range(lat_res - 1) 
+                            for j in range(lat_res) 
+                            for i in range(lat_res - 1)]).astype(np.float64)
+    
+    points = np.concatenate((points, extra_points))
+    
+    del extra_points
+    
+    new_size = len(points) * 3
+    
+    np.resize(relation, [new_size, new_size])
+    
+    del new_size
+    
+if lat_type == "BCC":
+
+    extra_points = np.array([[i + 0.5, j + 0.5, k + 0.5] 
+                             for k in range(lat_res - 1) 
+                             for j in range(lat_res - 1) 
+                             for i in range(lat_res - 1)]).astype(np.float64)
+    
+    points = np.concatenate((points, extra_points))
+    
+    del extra_points
+    
+    new_size = len(points) * 3
+    
+    np.resize(relation, [new_size, new_size])
+    
+    del new_size
+    
+    
+plotly.offline.init_notebook_mode()
+
+trace = go.Scatter3d(
+    x=points[:,0],  
+    y=points[:,1],
+    z=points[:,2],
+    mode='markers',
+    marker={
+        'size': 10,
+        'opacity': 0.8,
+    }
+)
+
+layout = go.Layout(
+    margin={'l': 0, 'r': 0, 'b': 0, 't': 0}
+)
+
+data = [trace]
+
+plot_figure = go.Figure(data=data, layout=layout)
+
+# Render the plot.
+plotly.offline.iplot(plot_figure)
 
 #%% compare numpy, numpy + numba and scipy times
 
