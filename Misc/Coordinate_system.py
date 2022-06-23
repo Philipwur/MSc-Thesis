@@ -12,6 +12,9 @@ import matplotlib.pyplot as plt
 from scipy.spatial import distance_matrix
 import seaborn as sns
 
+import plotly
+import plotly.graph_objs as go
+
 #lattice spacing between planes
 b_dash = 1
 
@@ -106,6 +109,100 @@ def vector_gen(v1, v2, Nx):
 points = vector_gen(v1, v2, Nx)
 euc = distance_matrix(points, points)
 print(np.average(euc))
+
+
+#%% 3D 3D pointgen
+
+lat_type = "SC"  #"FCC" and "BCC", anything other than FCC or BCC is assumed to be SC
+lat_res = 2 #lattice resolution
+    
+
+
+#Assigning the coordinates of the SC atoms (present in all lattices)
+#this can be sped up but doesnt take much time in the grand scheme of things
+points = np.array([[i, j, k] 
+                    for k in range(lat_res) 
+                    for j in range(lat_res) 
+                    for i in range(lat_res)]).astype(np.float64)
+
+tot_atoms = len(points)
+
+#preallocation
+relation = np.zeros((3 * tot_atoms, 3 * tot_atoms))
+
+if lat_type == "FCC":
+    
+    extra_points = np.array([[i + 0.5, j + 0.5, k] 
+                             for k in range(lat_res) 
+                             for j in range(lat_res - 1) 
+                             for i in range(lat_res - 1)]).astype(np.float64)
+    
+    points = np.concatenate((points, extra_points))
+    
+    extra_points = np.array([[i, j + 0.5, k + 0.5] 
+                            for k in range(lat_res - 1) 
+                            for j in range(lat_res - 1) 
+                            for i in range(lat_res)]).astype(np.float64)
+    
+    points = np.concatenate((points, extra_points))
+    
+    extra_points = np.array([[i + 0.5, j, k + 0.5] 
+                            for k in range(lat_res - 1) 
+                            for j in range(lat_res) 
+                            for i in range(lat_res - 1)]).astype(np.float64)
+    
+    points = np.concatenate((points, extra_points))
+    
+    del extra_points
+    
+    new_size = len(points) * 3
+    
+    np.resize(relation, [new_size, new_size])
+    
+    del new_size
+    
+if lat_type == "BCC":
+
+    extra_points = np.array([[i + 0.5, j + 0.5, k + 0.5] 
+                             for k in range(lat_res - 1) 
+                             for j in range(lat_res - 1) 
+                             for i in range(lat_res - 1)]).astype(np.float64)
+    
+    points = np.concatenate((points, extra_points))
+    
+    del extra_points
+    
+    new_size = len(points) * 3
+    
+    np.resize(relation, [new_size, new_size])
+    
+    del new_size
+    
+    
+plotly.offline.init_notebook_mode()
+
+trace = go.Scatter3d(
+    x=points[:,0],  
+    y=points[:,1],
+    z=points[:,2],
+    mode='markers',
+    marker={
+        'size': 10,
+        'opacity': 0.8,
+    }
+)
+
+layout = go.Layout(
+    margin={'l': 0, 'r': 0, 'b': 0, 't': 0}
+)
+
+data = [trace]
+
+plot_figure = go.Figure(data=data, layout=layout)
+
+# Render the plot.
+plotly.offline.iplot(plot_figure)
+
 
 #%% plotting coordinates for inspection
 
