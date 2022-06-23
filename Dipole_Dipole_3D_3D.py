@@ -38,16 +38,16 @@ def dipole_dipole(lat_type, lat_res):
         points = np.concatenate((points, extra_points))
 
         extra_points = np.array([[i, j + 0.5, k + 0.5] 
-                            for k in range(lat_res - 1) 
-                            for j in range(lat_res - 1) 
-                            for i in range(lat_res)]).astype(np.float64)
+                                 for k in range(lat_res - 1) 
+                                 for j in range(lat_res - 1) 
+                                 for i in range(lat_res)]).astype(np.float64)
 
         points = np.concatenate((points, extra_points))
 
         extra_points = np.array([[i + 0.5, j, k + 0.5] 
-                            for k in range(lat_res - 1) 
-                            for j in range(lat_res) 
-                            for i in range(lat_res - 1)]).astype(np.float64)
+                                 for k in range(lat_res - 1) 
+                                 for j in range(lat_res) 
+                                 for i in range(lat_res - 1)]).astype(np.float64)
 
         points = np.concatenate((points, extra_points))
 

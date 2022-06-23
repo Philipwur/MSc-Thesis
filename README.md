@@ -31,6 +31,10 @@ polarising.
 
 - start making optimisation algo
 - get results on the cluster
+- add to-do page rather than putting it in readme
+
+- Discuss with rahul about generating 3D-3D in the same way
+  - this should make atoms the same across the different crystal structures
 
 ### Later
 
@@ -83,10 +87,11 @@ w3
 - optimised runtime of 3D-3D
 - ran benchmarks
 - calculating high resolution sims
-- thought about parallelism
+- thought about periodicity
   - there is no reason for there to be perfect periodicity because the key element in calculating the alpha is the euclidian distance between points. When you distort the lattice to that extent, the average distance between the points will increase, which in turn will lower the alpha. The critical density calculation is not the problem. 
 - read up on eigenvalues 
 - do average distance calculation for x = 0.5 and x = 1.5 etc
+
 ## Notes 
 
 just random stuff for me, not rigourously checked
