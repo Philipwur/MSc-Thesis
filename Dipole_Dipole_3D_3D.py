@@ -8,7 +8,7 @@ Created on Tue Jun 12 13:56:52 2022
 import time
 
 import numpy as np
-import numpy.linalg as la
+import scipy.linalg as la
 from numba import njit
 
 #hyperparameters
@@ -98,7 +98,13 @@ def dipole_dipole(lat_type, lat_res):
 #finds alpha from the lower tril of the symmetric matrix
 def find_alpha(relation):
     
-    relation_eig = la.eigvalsh(relation, UPLO = "L")
+    relation_eig = la.eigh(relation,
+                           eigvals_only = True,
+                           overwrite_a = True,
+                           overwrite_b = True,
+                           check_finite = False,
+                           driver = "evd"
+                           )
     
     alpha = 1 / relation_eig[0]
     
