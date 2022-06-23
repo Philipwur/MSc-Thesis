@@ -89,7 +89,7 @@ print(end- start)
 #%% vector slant
 
 v1 = (1, 0)
-v2 = (2.5, 1)
+v2 = (1.5, 1)
 
 def vector_gen(v1, v2, Nx):
     proto_x = np.arange(0, v1[0]*Nx, v1[0])
