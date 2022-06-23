@@ -14,8 +14,8 @@ from numba import njit
 
 #hyperparameters
 
-lat_type = "SC"  #"FCC" and "BCC", anything other than FCC or BCC is assumed to be SC
-lat_res = 10 #lattice resolution
+lat_type = "BCC"  #"FCC" and "BCC", anything other than FCC or BCC is assumed to be SC
+lat_res = 13 #lattice resolution
 
 
 @njit()
@@ -65,8 +65,6 @@ def dipole_dipole(lat_type, lat_res):
         extra_points = None    
     
     tot_atoms = len(points)
-
-    print("atoms:",  len(points))
     
     #preallocation
     relation = np.zeros((3 * tot_atoms, 3 * tot_atoms))
@@ -96,7 +94,7 @@ def dipole_dipole(lat_type, lat_res):
             
             relation[i][j] = (term1 - kron * euc * euc) / (euc ** 5)
     
-    return relation
+    return relation, tot_atoms
 
 #finds alpha from the lower tril of the symmetric matrix
 def find_alpha(relation):
@@ -110,34 +108,32 @@ def find_alpha(relation):
 
 def main(lat_type, lat_res):
     
-    relation = dipole_dipole(lat_type, lat_res)
+    relation, tot_atoms = dipole_dipole(lat_type, lat_res)
     
     #print("array size:", relation.data.nbytes/(1024*1024*1024))
     
     alpha = find_alpha(relation)
     
-    return alpha
+    return alpha, tot_atoms
 
 
 if __name__ == "__main__":
     
     
-    _ = main(2, 5) #warmup function to get the main function compiled
+    _ = main(2, 3) #warmup function to get the main function compiled
     
     del _
     
     start = time.perf_counter()
     
-    alpha = main(lat_type, lat_res) #actual high resolution simulation
+    alpha, tot_atoms = main(lat_type, lat_res) #actual high resolution simulation
     
     end = time.perf_counter()
     
     #stats
     print("type:", lat_type)
+    print("# atoms: {}".format(tot_atoms))
     print("alpha:", alpha)
-    print("time - h:", (end - start)/(60*60))
     print("time - m:", (end - start)/(60))
     print("time - s:", (end - start))
     
-#%%
-
