@@ -1,4 +1,3 @@
-#%%
 # -*- coding: utf-8 -*-
 """
 Created on Tue Jun 12 13:56:52 2022
@@ -14,7 +13,7 @@ from numba import njit
 
 #hyperparameters
 
-lat_type = "BCC"  #"FCC" and "BCC", anything other than FCC or BCC is assumed to be SC
+lat_type = "BCC"  #"SC, "FCC" and "BCC"
 lat_res = 27 #lattice resolution
 
 
@@ -118,7 +117,6 @@ def main(lat_type, lat_res):
 
 
 if __name__ == "__main__":
-    
     
     _ = main("SC", 3) #warmup function to get the main function compiled
     
