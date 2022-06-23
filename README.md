@@ -28,7 +28,7 @@ polarising.
 ## To-Do
 
 ### Working on now
-- send flynn a version of the paragraph (why our size was limit)
+
 
 - pinning down irreducible parameter space
   - x is probably periodic, y greater than 1 maps to 1/y (confirm this)
@@ -111,7 +111,7 @@ W2
 - tested speed of vector lattice generation method (is about 225% faster with lattice vectors)
 - tested irreducible parameter space using lattice vectors
 
-w3
+W3
 - optimised runtime of 3D-3D
 - ran benchmarks
 - calculating high resolution sims
@@ -119,6 +119,9 @@ w3
   - there is no reason for there to be perfect periodicity because the key element in calculating the alpha is the euclidian distance between points. When you distort the lattice to that extent, the average distance between the points will increase, which in turn will lower the alpha. The critical density calculation is not the problem. 
 - read up on eigenvalues 
 - do average distance calculation for x = 0.5 and x = 1.5 etc
+
+W4
+- send flynn a version of the paragraph (why our size was limit)
 
 ## Notes 
 
