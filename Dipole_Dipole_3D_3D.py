@@ -15,54 +15,54 @@ from numba import njit
 #hyperparameters
 
 lat_type = "BCC"  #"FCC" and "BCC", anything other than FCC or BCC is assumed to be SC
-lat_res = 13 #lattice resolution
+lat_res = 27 #lattice resolution
 
 
 @njit()
 def dipole_dipole(lat_type, lat_res):
     
-    #Assigning the coordinates of the SC atoms (present in all lattices)
+     #Assigning the coordinates of the SC atoms (present in all lattices)
     #this can be sped up but doesnt take much time in the grand scheme of things
-    points = np.array([[i, j, k] 
-                       for k in range(lat_res) 
-                       for j in range(lat_res) 
-                       for i in range(lat_res)]).astype(np.float64)
+    if lat_type == "SC":
+        
+        points = np.array([[i, j, k] 
+                        for k in range(lat_res) 
+                        for j in range(lat_res) 
+                        for i in range(lat_res)]).astype(np.float64)
 
     if lat_type == "FCC":
-
-        extra_points = np.array([[i + 0.5, j + 0.5, k] 
-                                for k in range(lat_res) 
-                                for j in range(lat_res - 1) 
-                                for i in range(lat_res - 1)]).astype(np.float64)
-
-        points = np.concatenate((points, extra_points))
-
-        extra_points = np.array([[i, j + 0.5, k + 0.5] 
-                                 for k in range(lat_res - 1) 
-                                 for j in range(lat_res - 1) 
-                                 for i in range(lat_res)]).astype(np.float64)
-
-        points = np.concatenate((points, extra_points))
-
-        extra_points = np.array([[i + 0.5, j, k + 0.5] 
-                                 for k in range(lat_res - 1) 
-                                 for j in range(lat_res) 
-                                 for i in range(lat_res - 1)]).astype(np.float64)
-
-        points = np.concatenate((points, extra_points))
-
-        extra_points = None
+        
+        prim_mult = 4 ** (1/3)
+        
+        prim_vec = 0.5 * prim_mult * np.array([[0, 1, 1],[1, 0, 1],[1, 1, 0]])
+        
+        points = np.zeros((lat_res ** 3, 3))
+        
+        count = 0
+        
+        for i in range(lat_res):
+            for j in range(lat_res):
+                for k in range(lat_res):
+                    
+                    points[count, :] = i * prim_vec[0] + j * prim_vec[1] + k * prim_vec[2]
+                    count += 1
 
     if lat_type == "BCC":
 
-        extra_points = np.array([[i + 0.5, j + 0.5, k + 0.5] 
-                                for k in range(lat_res - 1) 
-                                for j in range(lat_res - 1) 
-                                for i in range(lat_res - 1)]).astype(np.float64)
-
-        points = np.concatenate((points, extra_points))
-
-        extra_points = None    
+        prim_mult = 2 ** (1/3)
+        
+        prim_vec = 0.5 * prim_mult * np.array([[-1, 1, 1],[1, -1, 1],[1, 1, -1]])
+        
+        points = np.zeros((lat_res ** 3, 3))
+        
+        count = 0
+        
+        for i in range(lat_res):
+            for j in range(lat_res):
+                for k in range(lat_res):
+                    
+                    points[count, :] = i * prim_vec[0] + j * prim_vec[1] + k * prim_vec[2]
+                    count += 1
     
     tot_atoms = len(points)
     
@@ -94,7 +94,7 @@ def dipole_dipole(lat_type, lat_res):
             
             relation[i][j] = (term1 - kron * euc * euc) / (euc ** 5)
     
-    return relation, tot_atoms
+    return relation
 
 #finds alpha from the lower tril of the symmetric matrix
 def find_alpha(relation):
@@ -108,31 +108,31 @@ def find_alpha(relation):
 
 def main(lat_type, lat_res):
     
-    relation, tot_atoms = dipole_dipole(lat_type, lat_res)
+    relation = dipole_dipole(lat_type, lat_res)
     
     #print("array size:", relation.data.nbytes/(1024*1024*1024))
     
     alpha = find_alpha(relation)
     
-    return alpha, tot_atoms
+    return alpha
 
 
 if __name__ == "__main__":
     
     
-    _ = main(2, 3) #warmup function to get the main function compiled
+    _ = main("SC", 3) #warmup function to get the main function compiled
     
     del _
     
-    start = time.perf_counter()
+    print("# atoms: {}".format(lat_res ** 3))
+    print("type:", lat_type)
     
-    alpha, tot_atoms = main(lat_type, lat_res) #actual high resolution simulation
+    start = time.perf_counter()
+
+    alpha = main(lat_type, lat_res) #actual high resolution simulation
     
     end = time.perf_counter()
-    
-    #stats
-    print("type:", lat_type)
-    print("# atoms: {}".format(tot_atoms))
+
     print("alpha:", alpha)
     print("time - m:", (end - start)/(60))
     print("time - s:", (end - start))
