@@ -9,6 +9,7 @@ import numpy as np
 from timeit import default_timer as timer
 
 import matplotlib.pyplot as plt
+from scipy.spatial import distance_matrix
 import seaborn as sns
 
 #lattice spacing between planes
@@ -85,7 +86,7 @@ print(end- start)
 #%% vector slant
 
 v1 = (1, 0)
-v2 = (0.3, 1)
+v2 = (2.5, 1)
 
 def vector_gen(v1, v2, Nx):
     proto_x = np.arange(0, v1[0]*Nx, v1[0])
@@ -101,10 +102,10 @@ def vector_gen(v1, v2, Nx):
     
     return points
 
-start = timer()
+
 points = vector_gen(v1, v2, Nx)
-end = timer()
-print(end- start)
+euc = distance_matrix(points, points)
+print(np.average(euc))
 
 #%% plotting coordinates for inspection
 
