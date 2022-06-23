@@ -42,9 +42,6 @@ polarising.
 - get results on the cluster
 - add to-do page rather than putting it in readme
 
-- Discuss with rahul about generating 3D-3D in the same way
-  - this should make atoms the same across the different crystal structures
-  - also include upper
   - look at matlab eig solver to add both ends
   - add current values found to the spreadsheet, add identifier and alt generation note
 
