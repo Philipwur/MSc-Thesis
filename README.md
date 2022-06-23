@@ -13,10 +13,13 @@ Below are some descriptions of all the code
 1. **Variable Analysis**  
 Contains file for testing variables, runtimes and graphing results from the 
 model.
+
 2. **Misc**  
 Contains miscellaneous testing and demo files. See folder for more info.
+
 3. **3D_3D Model**  
 Contains a Python translation of Rahul's original MATLAB script for the 3D case. Currently unoptimised.
+
 4. **Dipole_Dipole_2D_1D**  
 The model which genreates a lattice of points, and calulates the maximum 
 electric susceptibility values the lattice can take on without spontanously 
@@ -25,16 +28,41 @@ polarising.
 ## To-Do
 
 ### Working on now
+- send flynn a version of the paragraph (why our size was limit)
+
+- pinning down irreducible parameter space
+  - x is probably periodic, y greater than 1 maps to 1/y (confirm this)
 
 - Continued literature review
   + Figure of merit Nc (understand where the permitivity term comes from etc)
-
+  + ashcroft solid state physics page 95
+- beat BCC 24 FCC 25 SC 27
 - start making optimisation algo
 - get results on the cluster
 - add to-do page rather than putting it in readme
 
 - Discuss with rahul about generating 3D-3D in the same way
   - this should make atoms the same across the different crystal structures
+  - also include upper
+  - look at matlab eig solver to add both ends
+  - add current values found to the spreadsheet, add identifier and alt generation note
+
+- start writeup of literature review (page and a half )
+  - Meta materials
+  - Electric susceptibility and negative susceptibility
+    - negative static susceptibility (mention flynn's paper here)
+    - what it could do 
+  - Ferroelectricity (spontaneous polarisability) (briefly mention as an analogous process)
+    - we only model the transition not the polarised state
+  - Claussius mossotti model (allen)
+  - 2D array for modelling for the levitation problem, what is the best arrangement of this    array
+  - 2D bravais lattices review
+
+
+
+- next meet next week 1/07/20 @ 10AM (not the week after)
+
+
 
 ### Later
 
@@ -115,4 +143,8 @@ just random stuff for me, not rigourously checked
   w a point charge to levitate as a resullt
   of a force from a 2D plane. 
   
-- Next Meeting Friday the 27th meeting at 1pm
+- lack of peridoicity is a result of the error in extrapolation and the border 
+  of the lattice (distance increasing on average as x increases more than one)
+  - this effect vanishes the more the lattice resolution increases 
+
+- 8 pages

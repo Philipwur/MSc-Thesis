@@ -28,8 +28,8 @@ v1 = (1, 0)
 def objective_function(v1, v2):
     
     #based on term 11 and 12
-    x = (1/27, 1/29)
-    y = (fun.run_sim(v1, v2, 27)[0], fun.run_sim(v1, v2, 29)[0])
+    x = (1/46, 1/48)
+    y = (fun.run_sim(v1, v2, 46)[0], fun.run_sim(v1, v2, 48)[0])
 
     alpha = round(linregress(x, y).intercept, 5)
     
