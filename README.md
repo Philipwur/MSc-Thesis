@@ -2,6 +2,7 @@
 
 Philip Wurzner @ QMUL  
 Supervisor: Flynn Castles  
+Co-Supervisor: Rahul Dutta
 
 Program for simulating the Claussius-Mossoti model of spontaneous 
 polarisability for a 2D metamaterial with a negative susceptibility. Only the
