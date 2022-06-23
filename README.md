@@ -123,6 +123,7 @@ W3
 
 W4
 - send flynn a version of the paragraph (why our size was limit)
+- Rewrote FCC and BCC point gen in 3D-3D
 
 ## Notes 
 
