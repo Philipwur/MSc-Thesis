@@ -30,9 +30,6 @@ polarising.
 
 ### Working on now
 
-- pinning down irreducible parameter space
-  - x is probably periodic, y greater than 1 maps to 1/y (confirm this)
-
 - Continued literature review
   + Figure of merit Nc (understand where the permitivity term comes from etc)
   + ashcroft solid state physics page 95
@@ -116,6 +113,7 @@ W4
 - send flynn a version of the paragraph (why our size was limit)
 - Rewrote FCC and BCC point gen in 3D-3D
 - got results for FCC and BCC 27
+- explored symmetry, see explanation in figures
 
 ## Notes 
 
