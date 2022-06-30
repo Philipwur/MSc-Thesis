@@ -98,15 +98,10 @@ def dipole_dipole(lat_type, lat_res):
 #finds alpha from the lower tril of the symmetric matrix
 def find_alpha(relation):
     
-    relation_eig = la.eigh(relation,
-                           eigvals_only = True,
-                           overwrite_a = True,
-                           overwrite_b = True,
-                           check_finite = False,
-                           driver = "evd"
-                           )
+    relation_eig = la.eigh(relation, 
+                           eigvals_only= True)
     
-    alpha = 1 / relation_eig[0]
+    alpha = [1 / relation_eig[0], 1 / relation_eig[0]]
     
     return alpha
 

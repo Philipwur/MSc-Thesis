@@ -30,20 +30,14 @@ polarising.
 
 ### Working on now
 
-
 - pinning down irreducible parameter space
   - x is probably periodic, y greater than 1 maps to 1/y (confirm this)
 
 - Continued literature review
   + Figure of merit Nc (understand where the permitivity term comes from etc)
   + ashcroft solid state physics page 95
-- beat BCC 24 FCC 25 SC 27
 - start making optimisation algo
-- get results on the cluster
 - add to-do page rather than putting it in readme
-
-  - look at matlab eig solver to add both ends
-  - add current values found to the spreadsheet, add identifier and alt generation note
 
 - start writeup of literature review (page and a half )
   - Meta materials
@@ -121,6 +115,7 @@ W3
 W4
 - send flynn a version of the paragraph (why our size was limit)
 - Rewrote FCC and BCC point gen in 3D-3D
+- got results for FCC and BCC 27
 
 ## Notes 
 

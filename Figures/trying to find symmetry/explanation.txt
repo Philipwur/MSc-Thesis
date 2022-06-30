@@ -1,0 +1,3 @@
+For there to be reflective symmetry around the y-axis, 
+the Nc values would have to start lowering at the x = 0 and x = 1 lines
+but there is no reason for that to happen, since there is no repulsion effect at large distances
