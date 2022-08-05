@@ -5,6 +5,7 @@ Showing off how pog the the coordinate generation is
 """
 
 import math
+
 import numpy as np
 from timeit import default_timer as timer
 
@@ -86,10 +87,33 @@ start = timer()
 points = generate_lattice(Nx, b_dash, theta, tot_atoms)
 end = timer()
 print(end- start)
+
+
+#%%
+
+#slant v2
+
+def generate_lattice(N, v2):
+    
+    points = np.empty((0, 2), np.float64)
+    
+    #appending x row along y axis
+    for j in range(N):
+        
+        row = [(v2[0] * j + i, v2[1] * j) for i in range(N)]
+        
+        points = np.append(points, 
+                           row, 
+                           axis = 0
+                           )
+        
+    return points
+
+points = generate_lattice(17, (0.2, 0.4))
 #%% vector slant
 
 v1 = (1, 0)
-v2 = (1.5, 1)
+v2 = (0.2, 0.4)
 
 def vector_gen(v1, v2, Nx):
     proto_x = np.arange(0, v1[0]*Nx, v1[0])
@@ -106,14 +130,14 @@ def vector_gen(v1, v2, Nx):
     return points
 
 
-points = vector_gen(v1, v2, Nx)
+points = vector_gen(v1, v2, 17)
 euc = distance_matrix(points, points)
 print(np.average(euc))
 
 
 #%% 3D 3D pointgen
 
-lat_type = "SC"  #"FCC" and "BCC", anything other than FCC or BCC is assumed to be SC
+lat_type = "BCC"  #"FCC" and "BCC", anything other than FCC or BCC is assumed to be SC
 lat_res = 2 #lattice resolution
     
 
@@ -210,12 +234,11 @@ plt.figure(dpi = 300)
 g1 = sns.scatterplot(x = points[:,0],
                      y = points[:,1],
                      s = 10)
+
 plt.suptitle("Full Lattice", 
              y= 1)
 
-plt.title((r"b' : {},   $\theta$ : {}°,   N = {}".format(b_dash, 
-                                                         math.degrees(theta), 
-                                                         Nx)), 
+plt.title((r"v1 : {},   v2: {},   N = {}".format(v1, v2, Nx)), 
 
           fontsize = 12)
 
@@ -226,15 +249,15 @@ plt.figure(dpi = 300)
 g2 = sns.scatterplot(x = points[:,0], 
                      y = points[:,1])
 
-g2.set(xlim = (-0.5, 3.5), 
-       ylim = (-0.5, 5.5))
+g2.set(xlim = (-0.5, 5.5), 
+       ylim = (-0.5, 4.5))
 
+"""
 plt.suptitle("Zoomed in Lattice", 
           y = 1)
+"""
 
-plt.title((r"b' : {},   $\theta$ : {}°,   N = {}".format(b_dash, 
-                                                         math.degrees(theta), 
-                                                         Nx)), 
+plt.title((r"v1 : {},   v2: {},   N = {}".format(v1, v2, Nx)), 
           fontsize = 12)
 
 plt.xlabel("x")

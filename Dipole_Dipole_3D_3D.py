@@ -8,13 +8,14 @@ Created on Tue Jun 12 13:56:52 2022
 import time
 
 import numpy as np
-import scipy.linalg as la
+import numpy.linalg as la
+import scipy.linalg as sa
 from numba import njit
 
 #hyperparameters
 
-lat_type = "BCC"  #"SC, "FCC" and "BCC"
-lat_res = 27 #lattice resolution
+lat_type = "FCC"  #"SC, "FCC" and "BCC"
+lat_res = 28 #lattice resolution
 
 
 @njit()
@@ -43,7 +44,10 @@ def dipole_dipole(lat_type, lat_res):
             for j in range(lat_res):
                 for k in range(lat_res):
                     
-                    points[count, :] = i * prim_vec[0] + j * prim_vec[1] + k * prim_vec[2]
+                    points[count, :] = (i * prim_vec[0] 
+                                        + j * prim_vec[1] 
+                                        + k * prim_vec[2]
+                                        )
                     count += 1
 
     if lat_type == "BCC":
@@ -60,7 +64,9 @@ def dipole_dipole(lat_type, lat_res):
             for j in range(lat_res):
                 for k in range(lat_res):
                     
-                    points[count, :] = i * prim_vec[0] + j * prim_vec[1] + k * prim_vec[2]
+                    points[count, :] = (i * prim_vec[0] 
+                                        + j * prim_vec[1] 
+                                        + k * prim_vec[2])
                     count += 1
     
     tot_atoms = len(points)
@@ -98,10 +104,13 @@ def dipole_dipole(lat_type, lat_res):
 #finds alpha from the lower tril of the symmetric matrix
 def find_alpha(relation):
     
-    relation_eig = la.eigh(relation, 
+    relation_eig = sa.eigh(relation,
+                           lower = True,
+                           overwrite_a = True,
+                           check_finite = False,
                            eigvals_only= True)
     
-    alpha = [1 / relation_eig[0], 1 / relation_eig[0]]
+    alpha = [1 / relation_eig[0], 1 / relation_eig[-1]]
     
     return alpha
 
@@ -112,9 +121,9 @@ def main(lat_type, lat_res):
     
     #print("array size:", relation.data.nbytes/(1024*1024*1024))
     
-    alpha = find_alpha(relation)
+    #alpha = find_alpha(relation)
     
-    return alpha
+    return relation
 
 
 if __name__ == "__main__":
@@ -128,11 +137,22 @@ if __name__ == "__main__":
     
     start = time.perf_counter()
 
-    alpha = main(lat_type, lat_res) #actual high resolution simulation
+    relation = main(lat_type, lat_res) #actual high resolution simulation
     
     end = time.perf_counter()
 
-    print("alpha:", alpha)
+    #print("alpha:", alpha)
     print("time - m:", (end - start)/(60))
     print("time - s:", (end - start))
     
+#%%
+
+relation_eig = sa.eigh(relation,
+                       lower = True,
+                       overwrite_a = True,
+                       check_finite = False,
+                       eigvals_only= True)
+
+alpha = [1 / relation_eig[0], 1 / relation_eig[-1]]
+    
+print(alpha)

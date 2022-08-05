@@ -113,6 +113,8 @@ W4
 - send flynn a version of the paragraph (why our size was limit)
 - Rewrote FCC and BCC point gen in 3D-3D
 - got results for FCC and BCC 27
+  - howcome results are so similar is the new generation style, 
+  but different in the old one?
 - explored symmetry, see explanation in figures
 
 ## Notes 

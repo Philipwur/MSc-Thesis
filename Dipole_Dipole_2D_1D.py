@@ -1,8 +1,6 @@
 #%%
 # -*- coding: utf-8 -*-
 import time
-import math
-#import logging soon!
 
 import numpy as np
 import numpy.linalg as la
@@ -10,45 +8,37 @@ import numpy.linalg as la
 from numba import njit
 from scipy.spatial import distance_matrix
 
-#import my_functions as fun (no use for this atm)
-
-"""
-#test values verified rahul on 2d-1d case (square lattice)
-Nx, Ny = 500, 500
-a, b = 1, 1 (b':1, θ=90)
--ac = -0.110836246
-+ac = 0.377945157
-"""
 
 #variables defined here
 
 #lattice vectors
 v1 = (1, 0)
-v2 = (0, 1)
+v2 = (0, 0.1)
 
 #lattice resolution (how many atoms in x and y directions)
-lat_size = 27
+lat_size = 21
+
 
 
 #functions defined here
 
 # generates entire lattice and then slants it by v2
-def vector_gen(v1, v2, latsize, tot_atoms):
+def generate_lattice(N, v2):
     
-    proto_x = np.linspace(0, v1[0]*latsize, latsize)
-    proto_y = np.linspace(0, v2[1]*latsize, latsize)
+    points = np.empty((0, 2))
     
-    xm, ym = np.meshgrid(proto_x, proto_y)
-
-    try:
-        xm = xm + np.linspace(0, v2[0]*latsize, latsize)[:,None]
-    
-    finally:
-        points = np.column_stack([xm.ravel(), ym.ravel()]) 
+    #appending x row along y axis
+    for j in range(N):
         
-        dist = distance_matrix(points, points) + np.identity(tot_atoms)
-    
-        return points, dist
+        row = [(v2[0] * j + i, v2[1] * j) for i in range(N)]
+        
+        points = np.append(points, 
+                           row, 
+                           axis = 0)
+        
+    dist = distance_matrix(points, points) + np.identity((N ** 2))
+
+    return dist
 
 
 # function for calculating the dipole-dipole relation matrix
@@ -69,49 +59,35 @@ def calc_alpha(dip_relation):
     
     alpha = 1 / relation_eig[0]
 
-    return np.round(alpha, 5)
+    return alpha
 
-# =============================================================================
-# add logging here, or change print commands to update instead of create new ones
-# tqdm module for loading bar
-# =============================================================================
 
 #master function, containing excecution order and print commands
 def run_sim(v1, v2, lat_size):
     
-    print("--------------------------------")
-    print(" Variables:")
-    print(" v1:", v1)
-    print(" v2:", v2)
-    print(" Lattice resolution: {0} by {0}".format(lat_size))
+    #print("--------------------------------")
+    print("v2:", v2)
+    #print("Lattice resolution: {0} by {0}".format(lat_size))
     
     start_time = time.perf_counter()
     
     tot_atoms = (lat_size ** 2)
     
-    points, dist = vector_gen(v1, v2, lat_size, tot_atoms)
-    
-    time_dist = time.perf_counter()
-    print("\n", "Distance Matrix Created (s):", np.round(time_dist - start_time, 3))
+    dist = generate_lattice(lat_size, v2)
     
     dip_relation = generate_dip_relation(tot_atoms, dist)
-    
-    time_dip = time.perf_counter()
-    print(" Dipole Matrix Created (s):", np.round(time_dip - time_dist, 3))
-    
+        
     extreme_a = calc_alpha(dip_relation)
     
     end_time = time.perf_counter()
-    runtime = np.round(end_time - start_time, 3)
-    print(" Crit Alphas Calculated (s):", np.round(end_time - time_dip, 3))
-    print("\n", "Total Runtime (s):", runtime)
-    print(" Total Runtime (m):", np.round((end_time - start_time)/60, 3))
-    print(" Extreme Alphas:", extreme_a)
-    print("--------------------------------")
+    runtime = np.round(end_time - start_time, 5)
+    #print("Total Runtime (s):", runtime)
+    print("Extreme Alphas:", extreme_a)
     
-    return extreme_a, points
+    
+    return extreme_a, runtime
 
 
 if __name__ == "__main__":
     
-    alpha, points = run_sim(v1, v2, lat_size)
+    alpha, runtime = run_sim(v1, v2, lat_size)
