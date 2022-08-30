@@ -19,14 +19,14 @@ import Dipole_Dipole_2D_1D as fun
 
 steps = 64
 
-start_x = 0.2
-end_x = 0.8
-start_y = 0.25
-end_y = 1.2
+start_x = 0
+end_x = 3
+start_y = 0.4
+end_y = 1.5
 
 
 v1 = (1, 0)
-res = [19, 21]
+res = [24, 26]
 
 #%%
 def objective_function(v1, v2):
@@ -125,13 +125,13 @@ plt.show()
 '''
 
 fig2, ax = plt.subplots(dpi = 300)
-clev = np.arange(z.min(), z.max(),.004)
+clev = np.arange(z.min(), z.max(),.0018)
 cp = ax.contourf(xx, yy, z, clev, extend = 'both', cmap = "viridis")
 cbar2 = fig2.colorbar(cp)
-ax.set_xlabel("x")
-ax.set_ylabel("y")
-plt.suptitle(r"$N_{c-}^{'}$ with x and y vector components", y = 1.00)
-plt.title("Resolution = 64",  fontsize = 10, x = 0.60)
+ax.set_xlabel(r"$v2_{x}^{'}$")
+ax.set_ylabel(r"$v2_{y}^{'}$")
+plt.suptitle(r"$n_{c-}^{'}$ at Different Lattice Geometries", y = 1.00)
+#plt.title("Resolution = 64",  fontsize = 10, x = 0.60)
 cbar2.ax.get_yaxis().labelpad = 10
 cbar2.ax.set_ylabel(r"$N_{c-}^{'}$")
 plt.show()

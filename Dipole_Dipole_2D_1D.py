@@ -1,28 +1,25 @@
 #%%
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*
 import time
-
 import numpy as np
 import numpy.linalg as la
-
 from numba import njit
 from scipy.spatial import distance_matrix
 
 
 #variables defined here
 
-#lattice vectors
+#reduced lattice vectors
 v1 = (1, 0)
-v2 = (0, 0.1)
+v2 = (0.5, 0.5)
 
 #lattice resolution (how many atoms in x and y directions)
 lat_size = 21
 
 
-
 #functions defined here
 
-# generates entire lattice and then slants it by v2
+# generates lattice row by row, with rows displaced from eachother by v2
 def generate_lattice(N, v2):
     
     points = np.empty((0, 2))
@@ -81,8 +78,8 @@ def run_sim(v1, v2, lat_size):
     
     end_time = time.perf_counter()
     runtime = np.round(end_time - start_time, 5)
-    #print("Total Runtime (s):", runtime)
-    print("Extreme Alphas:", extreme_a)
+    print("Total Runtime (s):", runtime)
+    print("Extreme Alpha:", extreme_a)
     
     
     return extreme_a, runtime
