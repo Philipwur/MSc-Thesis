@@ -5,10 +5,11 @@ Created on Tue Jun 12 13:56:52 2022
 @author: Philipwur
 """
 
+#Imports
 import time
 import numpy as np
 import numpy.linalg as la
-import scipy.linalg as sa
+import scipy.linalg as sa #sa seems to be more reliable for large matrices, and la seems to be faster for smaller matrices
 from numba import njit
 
 #hyperparameters
