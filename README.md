@@ -24,7 +24,7 @@ The 3D version of the script which relates the lattice geometry of the lattice t
 The Script which optimises the lattice geometry of the 2D-1D lattice, to create the optimal "di-electric" levitation strength n_c
 
 5. **requirements**  
-The python modules required to run each file in this deposit
+The python modules required to run each file in this deposit  
 note - pipreqs used to make requirements file
 
  6. **thesis_#########**  
