@@ -1,4 +1,4 @@
-#%%
+# File for creating contourplots of n_c and alpha_c as a funciton of v2 components
 import sys
 sys.path.append("..")
 
