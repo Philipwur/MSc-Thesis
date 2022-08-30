@@ -1,9 +1,7 @@
-#%%
-#%%
+# script for trying to pin down the irreducible parameter space. Select a x and and y and it tests (x,y) and (x, 1/y)
 # -*- coding: utf-8 -*-
 import time
 import math
-#import logging soon!
 
 import numpy as np
 import numpy.linalg as la
@@ -12,15 +10,7 @@ from numba import njit
 from scipy.spatial import distance_matrix
 import matplotlib.pyplot as plt
 
-#import my_functions as fun (no use for this atm)
 
-"""
-#test values verified rahul on 2d-1d case (square lattice)
-Nx, Ny = 500, 500
-a, b = 1, 1 (b':1, θ=90)
--ac = -0.110836246
-+ac = 0.377945157
-"""
 
 #variables defined here
 
