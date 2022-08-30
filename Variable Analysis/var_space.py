@@ -1,4 +1,6 @@
 # script for trying to pin down the irreducible parameter space. Select a x and and y and it tests (x,y) and (x, 1/y)
+
+# Warning: somewhat depreciated script compared with the others
 # -*- coding: utf-8 -*-
 import time
 import math
