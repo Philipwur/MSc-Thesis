@@ -20,8 +20,7 @@ lat_res = 10 #lattice resolution (N)
 @njit()
 def dipole_dipole(lat_type, lat_res):
     
-    #Assigning the coordinates of the SC atoms (present in all lattices)
-    #this can be sped up but doesnt take much time in the grand scheme of things
+    #Assigning the coordinates of the SC atoms
     
     if lat_type == "SC":
         
@@ -30,6 +29,8 @@ def dipole_dipole(lat_type, lat_res):
                         for j in range(lat_res) 
                         for i in range(lat_res)]).astype(np.float64)
 
+    #Assigning the coordinates of the FCC atoms
+        
     if lat_type == "FCC":
         
         prim_mult = 4 ** (1/3)
@@ -49,7 +50,8 @@ def dipole_dipole(lat_type, lat_res):
                                         + k * prim_vec[2]
                                         )
                     count += 1
-
+    #Assigning the coordinates of the FCC atoms
+    
     if lat_type == "BCC":
 
         prim_mult = 2 ** (1/3)
@@ -68,7 +70,8 @@ def dipole_dipole(lat_type, lat_res):
                                         + j * prim_vec[1] 
                                         + k * prim_vec[2])
                     count += 1
-    
+                    
+    #Finding the total amount of atoms in the lattice
     tot_atoms = len(points)
     
     #preallocation of dipole-dipole matrix
@@ -89,19 +92,19 @@ def dipole_dipole(lat_type, lat_res):
             y1 = j % 3
             y2 = j // 3
             
-            kron = (((j - i) % 3 == 0) and (j != i))
+            kron = (((j - i) % 3 == 0) and (j != i)) #Kronecker-Delta Condition
             
             term1 = ((p2 - points[y2][x1]) *
                      (p1[y1] - points[y2][y1]) *
-                     3)
+                     3) #term1 is one of the two components on the numerator of the CMM 
             
-            euc = la.norm(p1 - points[y2]) if x2 != y2 else 1 
+            euc = la.norm(p1 - points[y2]) if x2 != y2 else 1 #Magnitude of the vector between points
             
-            relation[i][j] = (term1 - kron * euc * euc) / (euc ** 5)
+            relation[i][j] = (term1 - kron * euc * euc) / (euc ** 5) 
     
     return relation
 
-#finds alpha from the lower tril of the symmetric matrix
+#finds alpha from the lower tril of the symmetric matrix, since the matrix is symmetric the upper can be inferred
 def find_alpha(relation):
     
     relation_eig = sa.eigh(relation,
@@ -110,7 +113,7 @@ def find_alpha(relation):
                            check_finite = False,
                            eigvals_only= True)
     
-    alpha = [1 / relation_eig[0], 1 / relation_eig[-1]]
+    alpha = [1 / relation_eig[0], 1 / relation_eig[-1]] #taking the extremes of the eigenvalues
     
     return alpha
 
@@ -119,11 +122,11 @@ def main(lat_type, lat_res):
     
     relation = dipole_dipole(lat_type, lat_res)
     
-    #print("array size:", relation.data.nbytes/(1024*1024*1024))
+    #print("array size:", relation.data.nbytes/(1024*1024*1024)) #if memory size of the total array needs to be known
     
     alpha = find_alpha(relation)
     
-    return relation
+    return alpha
 
 
 if __name__ == "__main__":
@@ -137,10 +140,10 @@ if __name__ == "__main__":
     
     start = time.perf_counter()
 
-    relation = main(lat_type, lat_res) #actual high resolution simulation
+    alpha = main(lat_type, lat_res) #actual high resolution simulation
     
     end = time.perf_counter()
 
-    #print("alpha:", alpha)
+    print("alpha:", alpha)
     print("time - m:", (end - start)/(60))
     print("time - s:", (end - start))
