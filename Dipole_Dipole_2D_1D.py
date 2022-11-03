@@ -87,3 +87,4 @@ def run_sim(v1, v2, lat_size):
 if __name__ == "__main__":
     
     alpha, runtime = run_sim(v1, v2, lat_size)
+
