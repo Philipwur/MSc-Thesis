@@ -29,3 +29,6 @@ note - pipreqs used to make requirements file
 
  6. **thesis_#########**  
  The final version of the masters' thesis written on the 2D-1D + optimiser 
+
+TODO:
+JAX implementation
